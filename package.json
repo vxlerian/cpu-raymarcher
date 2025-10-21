@@ -1,0 +1,22 @@
+{
+  "name": "raymarcher-test",
+  "version": "1.0.0",
+  "description": "Hello there :)",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vite": "^7.1.10"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.4"
+  }
+}
