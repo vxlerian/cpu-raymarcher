@@ -11,6 +11,7 @@ type Job = {
   yStart: number;
   yEnd: number;
   camera: { pitch: number; yaw: number };
+  algorithm: string;
 };
 
 type Result = {
@@ -23,7 +24,7 @@ type Result = {
 };
 
 self.onmessage = (e: MessageEvent<Job>) => {
-  const { width, height, time, yStart, yEnd, camera } = e.data;
+  const { width, height, time, yStart, yEnd, camera, algorithm } = e.data;
 
   // Build a fresh scene and set camera orientation
   const scene = new Scene();
@@ -37,9 +38,18 @@ self.onmessage = (e: MessageEvent<Job>) => {
   const sdfEval = new Uint16Array(width * tileHeight);
   const iters = new Uint16Array(width * tileHeight);
 
-  // Run the algorithm for this tile... hardcoded to SphereTracer for now
-  // const alg = new SphereTracer();
-  const alg = new FixedStep();
+  // Run the algorithm for this tile
+  let alg;
+  switch (algorithm) {
+    case 'sphere-tracer':
+      alg = new SphereTracer();
+      break;
+    case 'fixed-step':
+      alg = new FixedStep();
+      break;
+    default:
+      alg = new SphereTracer();
+  }
 
   alg.runRaymarcher(
     scene,

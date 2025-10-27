@@ -4,7 +4,7 @@ import { Raymarcher } from "./raymarcher";
 
 // Initially were 500, 0.02, 0.001 respectively but rendering took way too long
 const MAX_DIST = 10;
-const STEP_SIZE = 0.3;
+const STEP_SIZE = 0.2;
 const EPSILON = 0.01;
 
 export class FixedStep extends Raymarcher {
@@ -25,41 +25,6 @@ export class FixedStep extends Raymarcher {
         const dir = vec3.create();
         const p = vec3.create();
         const origin = vec3.create();
-
-        // Helper for normal estimation via finite differences
-        const estimateNormal = (pos: vec3): vec3 => {
-            const e = 0.001;
-            const n = vec3.create();
-            const tmp = vec3.create();
-
-            const sampleSDF = (pt: vec3): number => {
-                let d = MAX_DIST;
-                for (const prim of scene.objectSDFs) {
-                    const s = prim.sdf(pt);
-                    if (s < d) d = s;
-                }
-                return d;
-            };
-
-            vec3.set(tmp, pos[0] + e, pos[1], pos[2]);
-            const dx1 = sampleSDF(tmp);
-            vec3.set(tmp, pos[0] - e, pos[1], pos[2]);
-            const dx2 = sampleSDF(tmp);
-
-            vec3.set(tmp, pos[0], pos[1] + e, pos[2]);
-            const dy1 = sampleSDF(tmp);
-            vec3.set(tmp, pos[0], pos[1] - e, pos[2]);
-            const dy2 = sampleSDF(tmp);
-
-            vec3.set(tmp, pos[0], pos[1], pos[2] + e);
-            const dz1 = sampleSDF(tmp);
-            vec3.set(tmp, pos[0], pos[1], pos[2] - e);
-            const dz2 = sampleSDF(tmp);
-
-            vec3.set(n, dx1 - dx2, dy1 - dy2, dz1 - dz2);
-            vec3.normalize(n, n);
-            return n;
-        };
 
         // Loop over pixels
         for (let y = yStart; y < yEnd; y++) {
@@ -114,7 +79,7 @@ export class FixedStep extends Raymarcher {
                 SDFevaluationBuffer[idx] = sdfCalls;
 
                 if (hit) {
-                    const n = estimateNormal(p);
+                    const n = this.getNormal(scene, p);
                     normalBuffer[idx * 3 + 0] = Math.round((n[0] * 0.5 + 0.5) * 255);
                     normalBuffer[idx * 3 + 1] = Math.round((n[1] * 0.5 + 0.5) * 255);
                     normalBuffer[idx * 3 + 2] = Math.round((n[2] * 0.5 + 0.5) * 255);
@@ -126,5 +91,24 @@ export class FixedStep extends Raymarcher {
                 }
             }
         }
+    }
+
+    private getSceneDistance(scene: Scene, position: vec3): number {
+        let closestDistance = MAX_DIST;
+        for (const primitive of scene.objectSDFs) {
+            closestDistance = Math.min(primitive.sdf(position), closestDistance);
+        }
+        return closestDistance;
+    }
+
+    private getNormal(scene: Scene, position: vec3): vec3 {
+        let d = this.getSceneDistance(scene, position);
+        const e = [0.01, 0, 0];
+        const n = vec3.create();
+        n[0] = d - this.getSceneDistance(scene, vec3.fromValues(position[0] - e[0], position[1], position[2]));
+        n[1] = d - this.getSceneDistance(scene, vec3.fromValues(position[0], position[1] - e[0], position[2]));
+        n[2] = d - this.getSceneDistance(scene, vec3.fromValues(position[0], position[1], position[2] - e[0]));
+        vec3.normalize(n, n);
+        return n;
     }
 }

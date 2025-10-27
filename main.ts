@@ -2,6 +2,8 @@ import { Scene } from './util/scene';
 import { ShadingModel } from './util/shading_models/shadingModel';
 import { PhongModel } from './util/shading_models/phongModel';
 import { NormalModel } from './util/shading_models/normalModel';
+import { SphereTracer } from './test_algorithms/sphereTracer';
+import { FixedStep } from './test_algorithms/fixedStep';
 
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
@@ -17,11 +19,20 @@ let shadingModel: ShadingModel = new NormalModel();
 document.getElementById('shading-models')!.addEventListener('change', e => {
     const selectedModel = (e.target as HTMLSelectElement).value;
     if (selectedModel === 'phong') {
-        console.log('phone');
         shadingModel = new PhongModel();
     } else if (selectedModel === 'normal') {
-        console.log('normal');
         shadingModel = new NormalModel();
+    }
+});
+
+// Getting algorithm
+let algorithm = 'sphere-tracer';
+document.getElementById('algorithm')!.addEventListener('change', e => {
+    const selectedAlgo = (e.target as HTMLSelectElement).value;
+    if (selectedAlgo === 'sphere-tracing') {
+        algorithm = 'sphere-tracer';
+    } else if (selectedAlgo === 'fixed-step') {
+        algorithm = 'fixed-step';
     }
 });
 
@@ -84,7 +95,7 @@ async function render(time: number) {
                 resolve(null);
             };
             w.addEventListener('message', handler);
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw } });
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm });
         });
     });
 

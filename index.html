@@ -13,7 +13,16 @@
              - menu to select algorithm to test
              -
             -->
-            <div id="options">
+            <div>
+                <label for="algorithm">Select algorithm: </label>
+
+                <select name="selectedAlgo" id="algorithm">
+                    <option value="sphere-tracing">Sphere Tracing</option>
+                    <option value="fixed-step">Fixed Step</option>
+                </select>
+            </div>
+
+            <div>
                 <label for="shading-model">Shading model: </label>
 
                 <select name="selectedModel" id="shading-models">
