@@ -12,8 +12,18 @@ const height = canvas.height;
 const fpsDisplay = document.getElementById("fps")!;
 const statusDisplay = document.getElementById("status")!;
 
-let shadingModel: ShadingModel;
-shadingModel = new NormalModel();
+let shadingModel: ShadingModel = new NormalModel();
+// Changing model
+document.getElementById('shading-models')!.addEventListener('change', e => {
+    const selectedModel = (e.target as HTMLSelectElement).value;
+    if (selectedModel === 'phong') {
+        console.log('phone');
+        shadingModel = new PhongModel();
+    } else if (selectedModel === 'normal') {
+        console.log('normal');
+        shadingModel = new NormalModel();
+    }
+});
 
 // Timing for FPS
 let lastFrame = performance.now();
@@ -114,10 +124,10 @@ async function render(time: number) {
 window.addEventListener("keydown", e => {
     const step = 0.1;
     switch (e.key) {
-        case "ArrowUp":    onPan(0, -step); break;
-        case "ArrowDown":  onPan(0,  step); break;
-        case "ArrowLeft":  onPan(-step, 0); break;
-        case "ArrowRight": onPan( step, 0); break;
+        case "ArrowUp":    onPan(0, step); break;
+        case "ArrowDown":  onPan(0, -step); break;
+        case "ArrowLeft":  onPan(step, 0); break;
+        case "ArrowRight": onPan(-step, 0); break;
         case "-":
         case "_":
             displayScale = Math.max(0.25, displayScale - 0.25);

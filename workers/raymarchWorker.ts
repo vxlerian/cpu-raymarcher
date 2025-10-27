@@ -38,7 +38,7 @@ self.onmessage = (e: MessageEvent<Job>) => {
 
   // Run the algorithm for this tile... hardcoded to SphereTracer for now
   const alg = new SphereTracer();
-  
+
   alg.runRaymarcher(
     scene,
     depth,
