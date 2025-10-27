@@ -55,6 +55,7 @@ self.onmessage = (e: MessageEvent<Job>) => {
   );
 
   const msg: Result = { yStart, yEnd, depth, normal, sdfEval, iters };
+
   // transfer buffers to avoid copying large arrays
   (self as unknown as Worker).postMessage(msg, [
     depth.buffer,

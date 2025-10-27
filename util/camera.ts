@@ -41,6 +41,22 @@ export class Camera {
         this.updateCameraTransform();
     }
 
+    public getPosition(out: vec3): vec3 {
+        out[0] = this.cameraTransform[12];
+        out[1] = this.cameraTransform[13];
+        out[2] = this.cameraTransform[14];
+        return out;
+    }
+
+    public transformDirection(out: vec3, dir: vec3): vec3 {
+        const m = this.cameraTransform;
+        const x = dir[0], y = dir[1], z = dir[2];
+        out[0] = m[0] * x + m[4] * y + m[8] * z;
+        out[1] = m[1] * x + m[5] * y + m[9] * z;
+        out[2] = m[2] * x + m[6] * y + m[10] * z;
+        return out;
+    }
+
     // call this every time the camera parameters change
     private updateCameraTransform() {
         const tempOrbitCentre = mat4.create();
