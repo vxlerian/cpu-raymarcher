@@ -119,10 +119,12 @@ window.addEventListener("keydown", e => {
         case "ArrowLeft":  onPan(-step, 0); break;
         case "ArrowRight": onPan( step, 0); break;
         case "-":
+        case "_":
             displayScale = Math.max(0.25, displayScale - 0.25);
             applyCanvasScale();
             break;
         case "+":
+        case "=":
             displayScale = Math.min(8, displayScale + 0.25);
             applyCanvasScale();
             break;
