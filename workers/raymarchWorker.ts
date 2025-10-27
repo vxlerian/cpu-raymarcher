@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import { Scene } from '../util/scene';
 import { SphereTracer } from '../test_algorithms/sphereTracer';
+import { FixedStep } from '../test_algorithms/fixedStep';
 
 // Types exchanged with the main thread
 type Job = {
@@ -37,7 +38,8 @@ self.onmessage = (e: MessageEvent<Job>) => {
   const iters = new Uint16Array(width * tileHeight);
 
   // Run the algorithm for this tile... hardcoded to SphereTracer for now
-  const alg = new SphereTracer();
+  // const alg = new SphereTracer();
+  const alg = new FixedStep();
 
   alg.runRaymarcher(
     scene,

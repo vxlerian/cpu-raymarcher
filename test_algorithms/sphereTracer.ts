@@ -22,9 +22,11 @@ export class SphereTracer extends Raymarcher {
     {
         for (let y = yStart; y < yEnd; y++) {
             const localY = y - yStart;
+            const v = y / height - 0.5;
+
             for (let x = 0; x < width; x++) {
                 const rayDir = vec3.create();
-                const [u, v] = [(x/width) - 0.5, (y/height) - 0.5];
+                const u = x / width - 0.5;
                 vec3.normalize(rayDir, vec3.fromValues(
                     u,
                     v,
