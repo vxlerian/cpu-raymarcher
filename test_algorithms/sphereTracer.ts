@@ -1,7 +1,7 @@
 import { Raymarcher } from './raymarcher'
 
-const MAX_STEPS = 255;
-const MAX_DIST = 1e10;
+const MAX_STEPS = 100;
+const MAX_DIST = 500;
 const EPSILON = 0.001;
 
 import { Scene } from '../util/scene';
@@ -16,9 +16,12 @@ export class SphereTracer extends Raymarcher {
         iterationsBuffer: Uint16Array,
         width: number,
         height: number,
-        time: number): void
+        time: number,
+        yStart: number = 0,
+        yEnd: number = height): void
     {
-        for (let y = 0; y < height; y++) {
+        for (let y = yStart; y < yEnd; y++) {
+            const localY = y - yStart;
             for (let x = 0; x < width; x++) {
                 const rayDir = vec3.create();
                 const [u, v] = [(x/width) - 0.5, (y/height) - 0.5];
@@ -30,7 +33,7 @@ export class SphereTracer extends Raymarcher {
                 const depth = this.rayMarch(scene, rayDir);
                 // const depth = this.getSceneDistance(scene, rayDir);
 
-                const idx = (y * width + x);
+                const idx = (localY * width + x);
                 const normalIdx = idx * 3;
 
                 const position = vec3.create();

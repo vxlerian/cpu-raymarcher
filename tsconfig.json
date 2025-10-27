@@ -5,7 +5,8 @@
     "moduleResolution": "node",
     "strict": true,
     "outDir": "dist",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "lib": ["ES2020", "DOM"]
   },
-  "include": ["main.ts"]
+  "include": ["**/*.ts"]
 }

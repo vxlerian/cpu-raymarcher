@@ -30,6 +30,17 @@ export class Camera {
         this.updateCameraTransform();
     }
 
+    // helpers to serialise/restore orientation (used by worker renderer)
+    public getAngles(): [number, number] {
+        return [this.pitch, this.yaw];
+    }
+
+    public setAngles(pitch: number, yaw: number) {
+        this.pitch = Math.min(Math.max(pitch, -Math.PI/2), Math.PI/2);
+        this.yaw = yaw;
+        this.updateCameraTransform();
+    }
+
     // call this every time the camera parameters change
     private updateCameraTransform() {
         const tempOrbitCentre = mat4.create();

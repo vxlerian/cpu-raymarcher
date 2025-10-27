@@ -1,6 +1,3 @@
-import { Raymarcher } from './test_algorithms/raymarcher'
-import { SphereTracer } from './test_algorithms/sphereTracer'
-import { Sphere } from './util/primitives/sphere';
 import { Scene } from './util/scene';
 import { ShadingModel } from './util/shading_models/shadingModel';
 import { PhongModel } from './util/shading_models/phongModel';
@@ -15,11 +12,6 @@ const height = canvas.height;
 const fpsDisplay = document.getElementById("fps")!;
 const statusDisplay = document.getElementById("status")!;
 
-// Here you can choose which algorithm and shading model to use. It's currently
-// hardcoded, but in future this could be changed with a dropdown or something.
-let algorithm: Raymarcher;
-algorithm = new SphereTracer();
-
 let shadingModel: ShadingModel;
 shadingModel = new NormalModel();
 
@@ -28,30 +20,67 @@ let lastFrame = performance.now();
 let frameCount = 0;
 
 const scene = new Scene();
+// Worker pool
+const NUM_WORKERS = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 1));
+const workers = Array.from({ length: NUM_WORKERS }, () =>
+  new Worker(new URL('./workers/raymarchWorker.ts', import.meta.url), { type: 'module' })
+);
+
+// Persistent buffers to avoid re-allocation each frame
+const depthBuffer = new Uint8ClampedArray(width * height);
+const normalBuffer = new Uint8ClampedArray(width * height * 3);
+const SDFevaluationBuffer = new Uint16Array(width * height);
+const iterationsBuffer = new Uint16Array(width * height);
+const outputBuffer = new Uint8ClampedArray(width * height * 4); // RGBA
+
+// Display scaling: keep internal resolution (width x height), scale via CSS only
+let displayScale = 1.0; // 1x = native internal size
+function applyCanvasScale() {
+    canvas.style.width = `${width * displayScale}px`;
+    canvas.style.height = `${height * displayScale}px`;
+    statusDisplay.textContent = `Status: scale ${displayScale.toFixed(2)}x`;
+}
+applyCanvasScale();
+
 // Main render loop
-function render(time: number) {
-    if (!algorithm) {
-        requestAnimationFrame(render);
-        return;
-    }
+async function render(time: number) {
+    // Partition rows across workers
+    const rowsPerWorker = Math.ceil(height / NUM_WORKERS);
+    const [pitch, yaw] = scene.camera.getAngles();
 
-    const depthBuffer = new Uint8ClampedArray(width * height);
-    const normalBuffer = new Uint8ClampedArray(width * height * 3);
-    const SDFevaluationBuffer = new Uint16Array(width * height);
-    const iterationsBuffer = new Uint16Array(width * height);
+    const jobs = workers.map((w, i) => {
+        const yStart = Math.min(i * rowsPerWorker, height);
+        const yEnd = Math.min((i + 1) * rowsPerWorker, height);
+        if (yStart >= yEnd) return Promise.resolve(null);
 
-    algorithm.runRaymarcher(
-        scene,
-        depthBuffer,
-        normalBuffer,
-        SDFevaluationBuffer,
-        iterationsBuffer,
-        width,
-        height,
-        time);
+        return new Promise<null>((resolve) => {
+            const handler = (e: MessageEvent<any>) => {
+                w.removeEventListener('message', handler);
+                const { yStart, yEnd, depth, normal, sdfEval, iters } = e.data as {
+                    yStart: number; yEnd: number;
+                    depth: Uint8ClampedArray; normal: Uint8ClampedArray;
+                    sdfEval: Uint16Array; iters: Uint16Array;
+                };
 
-    const outputBuffer = new Uint8ClampedArray(width * height * 4); // four channels for RGBA
+                // Copy tile buffers into full-frame buffers
+                const tileHeight = yEnd - yStart;
+                const pixelOffset = yStart * width;
+                depthBuffer.set(depth, pixelOffset);
+                SDFevaluationBuffer.set(sdfEval, pixelOffset);
+                iterationsBuffer.set(iters, pixelOffset);
+                const normalOffset = yStart * width * 3;
+                normalBuffer.set(normal, normalOffset);
 
+                resolve(null);
+            };
+            w.addEventListener('message', handler);
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw } });
+        });
+    });
+
+    await Promise.all(jobs);
+
+    // Shade on main thread using your current shading model
     shadingModel.shade(
         outputBuffer,
         depthBuffer,
@@ -89,6 +118,16 @@ window.addEventListener("keydown", e => {
         case "ArrowDown":  onPan(0,  step); break;
         case "ArrowLeft":  onPan(-step, 0); break;
         case "ArrowRight": onPan( step, 0); break;
+        case "-":
+        case "_":
+            displayScale = Math.max(0.25, displayScale - 0.25);
+            applyCanvasScale();
+            break;
+        case "+":
+        case "=":
+            displayScale = Math.min(8, displayScale + 0.25);
+            applyCanvasScale();
+            break;
     }
 });
 function onPan(dx: number, dy: number) {
