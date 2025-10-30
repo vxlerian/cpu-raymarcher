@@ -35,5 +35,8 @@ export abstract class Raymarcher {
         iterationsBuffer: Uint16Array,
         width: number,
         height: number,
-        time: number): void
+        time: number,
+        yStart: number,
+        yEnd: number
+    ): void
 }

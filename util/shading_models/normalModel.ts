@@ -18,7 +18,6 @@ export class NormalModel extends ShadingModel {
                 const normalIdx = idx * 3;
                 const shadedIdx = idx * 4;
 
-                // shadedBuffer[shadedIdx] = normalBuffer[normalIdx];
                 shadedBuffer[shadedIdx] = normalBuffer[normalIdx];
                 shadedBuffer[shadedIdx + 1] = normalBuffer[normalIdx + 1];
                 shadedBuffer[shadedIdx + 2] = normalBuffer[normalIdx + 2];

@@ -2,6 +2,8 @@ import { Scene } from './util/scene';
 import { ShadingModel } from './util/shading_models/shadingModel';
 import { PhongModel } from './util/shading_models/phongModel';
 import { NormalModel } from './util/shading_models/normalModel';
+import { SphereTracer } from './test_algorithms/sphereTracer';
+import { FixedStep } from './test_algorithms/fixedStep';
 
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
@@ -12,8 +14,27 @@ const height = canvas.height;
 const fpsDisplay = document.getElementById("fps")!;
 const statusDisplay = document.getElementById("status")!;
 
-let shadingModel: ShadingModel;
-shadingModel = new NormalModel();
+let shadingModel: ShadingModel = new NormalModel();
+// Changing model
+document.getElementById('shading-models')!.addEventListener('change', e => {
+    const selectedModel = (e.target as HTMLSelectElement).value;
+    if (selectedModel === 'phong') {
+        shadingModel = new PhongModel();
+    } else if (selectedModel === 'normal') {
+        shadingModel = new NormalModel();
+    }
+});
+
+// Getting algorithm
+let algorithm = 'sphere-tracer';
+document.getElementById('algorithm')!.addEventListener('change', e => {
+    const selectedAlgo = (e.target as HTMLSelectElement).value;
+    if (selectedAlgo === 'sphere-tracing') {
+        algorithm = 'sphere-tracer';
+    } else if (selectedAlgo === 'fixed-step') {
+        algorithm = 'fixed-step';
+    }
+});
 
 // Timing for FPS
 let lastFrame = performance.now();
@@ -74,7 +95,7 @@ async function render(time: number) {
                 resolve(null);
             };
             w.addEventListener('message', handler);
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw } });
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm });
         });
     });
 
@@ -114,10 +135,10 @@ async function render(time: number) {
 window.addEventListener("keydown", e => {
     const step = 0.1;
     switch (e.key) {
-        case "ArrowUp":    onPan(0, -step); break;
-        case "ArrowDown":  onPan(0,  step); break;
-        case "ArrowLeft":  onPan(-step, 0); break;
-        case "ArrowRight": onPan( step, 0); break;
+        case "ArrowUp":    onPan(0, step); break;
+        case "ArrowDown":  onPan(0, -step); break;
+        case "ArrowLeft":  onPan(step, 0); break;
+        case "ArrowRight": onPan(-step, 0); break;
         case "-":
         case "_":
             displayScale = Math.max(0.25, displayScale - 0.25);
