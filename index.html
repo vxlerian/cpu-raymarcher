@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CPU Shader Tester</title>
+    <link rel="stylesheet" href="style.css">
+  <script type="module" crossorigin src="/raymarcher-test/assets/index-CWNCxEnA.js"></script>
+</head>
+<body>
+    <div id="app">
+        <div id="editor-container">
+            <!-- to go in here:
+             - a crud editor for the scene
+             - menu to select algorithm to test
+             -
+            -->
+            <div>
+                <label for="algorithm">Select algorithm: </label>
+
+                <select name="selectedAlgo" id="algorithm">
+                    <option value="sphere-tracing">Sphere Tracing</option>
+                    <option value="fixed-step">Fixed Step</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="scene-select">Select scene: </label>
+                <select name="selectedScene" id="scene-select">
+                    <!-- Will be filled automatically in main.ts -->
+                </select>
+            </div>
+
+            <div>
+                <label for="shading-model">Shading model: </label>
+
+                <select name="selectedModel" id="shading-models">
+                    <option value="normal">Normal</option>
+                    <option value="phong">Phong</option>
+                    <option value="sdf-heatmap">SDF Heatmap</option>
+                    <option value="iteration-heatmap">Iteration Heatmap</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="canvas-container">
+            <canvas id="shader-canvas" width="256" height="256"></canvas>
+            <!-- resolution is currently at a fixed 512 x 512 but we can
+             eventually let the user select a resolution.
+            -->
+        </div>
+
+        <div id="diagnostics">
+            <p style="margin-top: 0px;" id="fps">Frame length: 0</p>
+            <p id="status">Status: idk</p>
+            <div style="margin-top: 10px; font-size: 0.9em;">
+                <strong>Controls:</strong><br>
+                Arrow keys: Camera<br>
+                -/+: Scale display<br>
+            </div>
+            <!-- to go in here:
+             - menu to select view: shaded mode, SDF evaluations, iterations.
+             - maximum steps: (probably ~200 by default)
+             - epsilon/hit threshold: ~0.001
+             - other diagnostic stuff like average number of sdf evaluations
+             or whatever other cool graphs to display our data. TBD :)
+             -->
+        </div>
+    </div>
+
+</body>
+</html>
