@@ -19,7 +19,7 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node
@@ -30,11 +30,16 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build Vite project
+      - name: Build project
         run: npm run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: dist
+          artifact_name: github-pages
 
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
-        with:
-          artifact-path: dist
         id: deployment
+        
