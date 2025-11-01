@@ -60,8 +60,8 @@ export class Camera {
     // call this every time the camera parameters change
     private updateCameraTransform() {
         const tempOrbitCentre = mat4.create();
-        mat4.rotateX(tempOrbitCentre, mat4.create(), this.pitch);
-        mat4.rotateY(this.orbitCentre, tempOrbitCentre, this.yaw);
+        mat4.rotateY(tempOrbitCentre, mat4.create(), this.yaw);
+        mat4.rotateX(this.orbitCentre, tempOrbitCentre, this.pitch);
         mat4.translate(this.cameraTransform, this.orbitCentre,
             vec3.fromValues(0, 0, Math.abs(this.cameraDistance))
         );

@@ -3,8 +3,10 @@ import { SceneManager } from './util/sceneManager';
 import { ShadingModel } from './util/shading_models/shadingModel';
 import { PhongModel } from './util/shading_models/phongModel';
 import { NormalModel } from './util/shading_models/normalModel';
-import { SphereTracer } from './test_algorithms/sphereTracer';
-import { FixedStep } from './test_algorithms/fixedStep';
+import { SphereTracer } from './cpu_algorithms/sphereTracer';
+import { FixedStep } from './cpu_algorithms/fixedStep';
+import { SDFHeatmap } from './util/shading_models/SDFHeatmap';
+import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
 
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
@@ -19,10 +21,21 @@ let shadingModel: ShadingModel = new NormalModel();
 // Changing model
 document.getElementById('shading-models')!.addEventListener('change', e => {
     const selectedModel = (e.target as HTMLSelectElement).value;
-    if (selectedModel === 'phong') {
-        shadingModel = new PhongModel();
-    } else if (selectedModel === 'normal') {
-        shadingModel = new NormalModel();
+    switch (selectedModel) {
+        case 'phong':
+            shadingModel = new PhongModel();
+            break;
+        case 'normal':
+            shadingModel = new NormalModel();
+            break;
+        case 'sdf-heatmap':
+            shadingModel = new SDFHeatmap();
+            break;
+        case 'iteration-heatmap':
+            shadingModel = new IterationHeatmap();
+            break;
+        default:
+            shadingModel = new NormalModel();
     }
 });
 
@@ -30,10 +43,15 @@ document.getElementById('shading-models')!.addEventListener('change', e => {
 let algorithm = 'sphere-tracer';
 document.getElementById('algorithm')!.addEventListener('change', e => {
     const selectedAlgo = (e.target as HTMLSelectElement).value;
-    if (selectedAlgo === 'sphere-tracing') {
+    switch (selectedAlgo) {
+    case 'sphere-tracer':
         algorithm = 'sphere-tracer';
-    } else if (selectedAlgo === 'fixed-step') {
+        break;
+    case 'fixed-step':
         algorithm = 'fixed-step';
+        break;
+    default:
+        algorithm = 'sphere-tracer';
     }
 });
 

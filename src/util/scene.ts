@@ -24,7 +24,7 @@ export class Scene {
     public loadPreset(index: number) {
         this.currentPresetIndex = Math.max(0, Math.min(index, SceneManager.getPresetCount() - 1));
         const preset = SceneManager.getPreset(this.currentPresetIndex);
-        
+
         // Clear existing objects and load new ones
         this.objectSDFs = [...preset.objects];
     }

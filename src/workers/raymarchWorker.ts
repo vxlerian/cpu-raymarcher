@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 import { Scene } from '../util/scene';
-import { SphereTracer } from '../test_algorithms/sphereTracer';
-import { FixedStep } from '../test_algorithms/fixedStep';
+import { SphereTracer } from '../cpu_algorithms/sphereTracer';
+import { FixedStep } from '../cpu_algorithms/fixedStep';
 
 // Types exchanged with the main thread
 type Job = {

@@ -1,6 +1,8 @@
-import { mat4 } from "gl-matrix";
+import { vec3, mat4 } from "gl-matrix";
 import { Primitive } from "./primitives/primitive";
 import { Sphere } from "./primitives/sphere";
+import { Box } from "./primitives/box";
+import { Torus } from "./primitives/torus";
 
 export type Scene = {
     name: string;
@@ -14,15 +16,19 @@ export class SceneManager {
         return new Sphere(transform, radius);
     }
 
+    private static createBox(x: number, y: number, z: number, halfSize: vec3): Box {
+        const transform = mat4.create();
+        mat4.fromRotationTranslationScale(transform, [0,0,0,1], [x,y,z], [1,1,1]);
+        return new Box(transform, halfSize);
+    }
+
+    private static createTorus(x: number, y: number, z: number, radius: number): Primitive {
+        const transform = mat4.create();
+        mat4.fromRotationTranslationScale(transform, [0,0,0,1], [x,y,z], [1,1,1]);
+        return new Torus(transform, radius, radius / 4);
+    }
+
     public static readonly presets: Scene[] = [
-        {
-            name: "Overlapping spheres",
-            objects: [
-                SceneManager.createSphere(0, 0, 0, 1),
-                SceneManager.createSphere(0, 1, 0, 0.6),
-                SceneManager.createSphere(1, 0, -0.5, 0.9)
-            ]
-        },
         {
             name: "Single sphere",
             objects: [
@@ -44,7 +50,7 @@ export class SceneManager {
             ]
         },
         {
-            name: "Atom thingo",
+            name: "Atom",
             objects: [
                 SceneManager.createSphere(0, 0, 0, 0.5),
                 SceneManager.createSphere(1.2, 0, 0, 0.3),
@@ -56,7 +62,7 @@ export class SceneManager {
             ]
         },
         {
-            name: "Bunch of random spheres",
+            name: "Random spheres",
             objects: [
                 SceneManager.createSphere(0.8, -0.3, 0.2, 0.4),
                 SceneManager.createSphere(-0.5, 0.9, -0.1, 0.5),
@@ -65,6 +71,33 @@ export class SceneManager {
                 SceneManager.createSphere(0.4, -0.8, 0.5, 0.35),
                 SceneManager.createSphere(-0.2, 0.6, -0.9, 0.4),
                 SceneManager.createSphere(0.7, 0.3, -0.4, 0.25)
+            ]
+        },
+        {
+            name: "Cube",
+            objects: [
+                SceneManager.createBox(0, 0, 0, vec3.fromValues(1, 1, 1))
+            ]
+        },
+        {
+            name: "Sphere and Cube",
+            objects: [
+                SceneManager.createSphere(-0.7, 0, 0, 0.5),
+                SceneManager.createBox(1, 0, 0, vec3.fromValues(0.5, 0.5, 0.5))
+            ]
+        },
+        {
+            name: "Pyramid of Boxes",
+            objects: [
+                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
+                SceneManager.createBox(0, 0, 0, vec3.fromValues(0.6, 0.25, 0.6)),
+                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
+            ]
+        },
+        {
+            name: "Torus",
+            objects: [
+                SceneManager.createTorus(0, 0, 0, 1.3)
             ]
         }
     ];

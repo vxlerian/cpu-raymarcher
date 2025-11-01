@@ -2,7 +2,7 @@
   "name": "raymarcher-test",
   "version": "1.0.0",
   "description": "Hello there :)",
-  "main": "main.js",
+  "main": "src/main.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "vite",
@@ -13,10 +13,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/three": "^0.181.0",
     "typescript": "^5.9.3",
     "vite": "^7.1.10"
   },
   "dependencies": {
-    "gl-matrix": "^3.4.4"
+    "gl-matrix": "^3.4.4",
+    "three": "^0.181.0"
   }
 }
