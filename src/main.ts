@@ -7,7 +7,7 @@ import { SphereTracer } from './cpu_algorithms/sphereTracer';
 import { FixedStep } from './cpu_algorithms/fixedStep';
 import { SDFHeatmap } from './util/shading_models/SDFHeatmap';
 import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
-
+import './style.css';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
