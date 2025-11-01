@@ -1,8 +1,9 @@
 body {
-    font-family: papyrus, sans-serif;
+    font-family: verdana, sans-serif;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: left;
+    margin: 5%
 }
 
 #app {

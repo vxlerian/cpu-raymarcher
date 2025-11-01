@@ -23,6 +23,13 @@
             </div>
 
             <div>
+                <label for="scene-select">Select scene: </label>
+                <select name="selectedScene" id="scene-select">
+                    <!-- Will be filled automatically in main.ts -->
+                </select>
+            </div>
+
+            <div>
                 <label for="shading-model">Shading model: </label>
 
                 <select name="selectedModel" id="shading-models">
@@ -40,8 +47,13 @@
         </div>
 
         <div id="diagnostics">
-            <p id="fps">FPS: 0</p>
+            <p style="margin-top: 0px;" id="fps">Frame length: 0</p>
             <p id="status">Status: idk</p>
+            <div style="margin-top: 10px; font-size: 0.9em;">
+                <strong>Controls:</strong><br>
+                Arrow keys: Camera<br>
+                -/+: Scale display<br>
+            </div>
             <!-- to go in here:
              - menu to select view: shaded mode, SDF evaluations, iterations.
              - maximum steps: (probably ~200 by default)

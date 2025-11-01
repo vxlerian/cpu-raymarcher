@@ -1,4 +1,5 @@
 import { Scene } from './util/scene';
+import { SceneManager } from './util/sceneManager';
 import { ShadingModel } from './util/shading_models/shadingModel';
 import { PhongModel } from './util/shading_models/phongModel';
 import { NormalModel } from './util/shading_models/normalModel';
@@ -41,6 +42,20 @@ let lastFrame = performance.now();
 let frameCount = 0;
 
 const scene = new Scene();
+
+// Scene dropdown setup
+const sceneSelect = document.getElementById('scene-select') as HTMLSelectElement;
+
+// Handle scene dropdown changes
+sceneSelect.addEventListener('change', (e) => {
+    const selectedIndex = parseInt((e.target as HTMLSelectElement).value);
+    scene.loadPreset(selectedIndex);
+});
+
+// Initialise dropdown with current scene
+const sceneInfo = scene.getCurrentPresetInfo();
+SceneManager.populateSceneDropdown(sceneSelect, sceneInfo.index);
+
 // Worker pool
 const NUM_WORKERS = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 1));
 const workers = Array.from({ length: NUM_WORKERS }, () =>
@@ -61,6 +76,7 @@ function applyCanvasScale() {
     canvas.style.height = `${height * displayScale}px`;
     statusDisplay.textContent = `Status: scale ${displayScale.toFixed(2)}x`;
 }
+
 applyCanvasScale();
 
 // Main render loop
@@ -95,7 +111,8 @@ async function render(time: number) {
                 resolve(null);
             };
             w.addEventListener('message', handler);
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm });
+            const sceneInfo = scene.getCurrentPresetInfo();
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index });
         });
     });
 
@@ -123,7 +140,7 @@ async function render(time: number) {
     //     frameCount = 0;
     //     lastFrame = now;
     // }
-    fpsDisplay.textContent = `frame length: ${(now - lastFrame).toPrecision(4)}`;
+    fpsDisplay.textContent = `Frame length: ${(now - lastFrame).toPrecision(4)}`;
     lastFrame = now;
 
     scene.updateInverseSceneTransforms();

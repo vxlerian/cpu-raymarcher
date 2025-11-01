@@ -12,6 +12,7 @@ type Job = {
   yEnd: number;
   camera: { pitch: number; yaw: number };
   algorithm: string;
+  scenePresetIndex: number;
 };
 
 type Result = {
@@ -24,10 +25,11 @@ type Result = {
 };
 
 self.onmessage = (e: MessageEvent<Job>) => {
-  const { width, height, time, yStart, yEnd, camera, algorithm } = e.data;
+  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex } = e.data;
 
   // Build a fresh scene and set camera orientation
   const scene = new Scene();
+  scene.loadPreset(scenePresetIndex); // Load the current scene
   scene.camera.setAngles(camera.pitch, camera.yaw);
   scene.updateInverseSceneTransforms();
 
