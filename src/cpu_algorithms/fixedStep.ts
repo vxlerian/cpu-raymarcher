@@ -3,7 +3,7 @@ import { Scene } from "../util/scene";
 import { Raymarcher } from "./raymarcher";
 
 // Initially were 500, 0.02, 0.001 respectively but rendering took way too long
-const MAX_DIST = 10;
+const MAX_DIST = 20;
 const STEP_SIZE = 0.2;
 const EPSILON = 0.01;
 

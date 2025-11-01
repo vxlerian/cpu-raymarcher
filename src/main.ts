@@ -168,7 +168,7 @@ async function render(time: number) {
 
 // thanks chatgpt
 window.addEventListener("keydown", e => {
-    const step = 0.1;
+    const step = 0.05;
     switch (e.key) {
         case "ArrowUp":    onPan(0, step); break;
         case "ArrowDown":  onPan(0, -step); break;
@@ -186,6 +186,7 @@ window.addEventListener("keydown", e => {
             break;
     }
 });
+
 function onPan(dx: number, dy: number) {
     scene.camera.rotateCamera(-dy, dx);
     scene.updateInverseSceneTransforms();

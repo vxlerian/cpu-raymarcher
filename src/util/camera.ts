@@ -11,7 +11,7 @@ export class Camera {
 
     constructor() {
         this.orbitCentre = mat4.create();
-        this.cameraDistance = 5;
+        this.cameraDistance = 7;
         this.pitch = 0;
         this.yaw = 0;
         this.cameraTransform = mat4.create();
@@ -42,9 +42,16 @@ export class Camera {
     }
 
     public getPosition(out: vec3): vec3 {
-        out[0] = this.cameraTransform[12];
-        out[1] = this.cameraTransform[13];
-        out[2] = this.cameraTransform[14];
+        // Calculate position in spherical coordinates
+        // For proper orbit: pitch should affect both X and Z, not just Y
+        const cosYaw = Math.cos(this.yaw);
+        const sinYaw = Math.sin(this.yaw);
+        const cosPitch = Math.cos(this.pitch);
+        const sinPitch = Math.sin(this.pitch);
+        
+        out[0] = this.cameraDistance * cosPitch * sinYaw;
+        out[1] = this.cameraDistance * sinPitch;
+        out[2] = this.cameraDistance * cosPitch * cosYaw;
         return out;
     }
 
@@ -59,11 +66,25 @@ export class Camera {
 
     // call this every time the camera parameters change
     private updateCameraTransform() {
-        const tempOrbitCentre = mat4.create();
-        mat4.rotateY(tempOrbitCentre, mat4.create(), this.yaw);
-        mat4.rotateX(this.orbitCentre, tempOrbitCentre, this.pitch);
-        mat4.translate(this.cameraTransform, this.orbitCentre,
-            vec3.fromValues(0, 0, Math.abs(this.cameraDistance))
-        );
+        // Build transformation matrix for orbit camera looking at origin
+        // Calculate camera position
+        const cameraPos = vec3.create();
+        this.getPosition(cameraPos);
+        
+        // Build a look-at matrix (camera looking at origin)
+        const target = vec3.fromValues(0, 0, 0); // Looking at origin
+        const up = vec3.fromValues(0, 1, 0);     // World up vector
+        
+        const viewMatrix = mat4.create();
+        mat4.lookAt(viewMatrix, cameraPos, target, up);
+        
+        // We want the rotation part only (no translation) for transforming directions
+        // The lookAt matrix is a view matrix, so we need its inverse rotation part
+        mat4.invert(this.cameraTransform, viewMatrix);
+        
+        // Zero out the translation component - we only want rotation
+        this.cameraTransform[12] = 0;
+        this.cameraTransform[13] = 0;
+        this.cameraTransform[14] = 0;
     }
 }
