@@ -16,6 +16,12 @@ const height = canvas.height;
 const fpsDisplay = document.getElementById("fps")!;
 const statusDisplay = document.getElementById("status")!;
 
+const averageSDFCallsDisplay = document.getElementById("average-sdf-calls")!;
+const maxSDFCallsDisplay = document.getElementById("max-sdf-calls")!;
+const minSDFCallsDisplay = document.getElementById("min-sdf-calls")!;
+
+const averageIterationsDisplay = document.getElementById("average-iterations")!;
+
 let shadingModel: ShadingModel = new NormalModel();
 // Changing model
 document.getElementById('shading-models')!.addEventListener('change', e => {
@@ -159,6 +165,29 @@ async function render(time: number) {
     // }
     fpsDisplay.textContent = `Frame length: ${(now - lastFrame).toPrecision(4)}`;
     lastFrame = now;
+
+    // Update SDF calls and iterations diagnostics
+    const totalPixels = width * height;
+    let totalSDFCalls = 0;
+    let maxSDFCalls = 0;
+    let minSDFCalls = Number.MAX_SAFE_INTEGER;
+    let totalIterations = 0;
+
+    for (let i = 0; i < totalPixels; i++) {
+        const sdfCalls = SDFevaluationBuffer[i];
+        totalSDFCalls += sdfCalls;
+        totalIterations += iterationsBuffer[i];
+        if (sdfCalls > maxSDFCalls) maxSDFCalls = sdfCalls;
+        if (sdfCalls < minSDFCalls) minSDFCalls = sdfCalls;
+    }
+
+    const averageSDFCalls = totalSDFCalls / totalPixels;
+    const averageIterations = totalIterations / totalPixels;
+
+    averageSDFCallsDisplay.textContent = `Average SDF calls: ${averageSDFCalls.toFixed(2)}`;
+    maxSDFCallsDisplay.textContent = `Max SDF calls: ${maxSDFCalls}`;
+    minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
+    averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
     requestAnimationFrame(render);
 }
