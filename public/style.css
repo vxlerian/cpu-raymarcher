@@ -67,7 +67,7 @@ h1 {
 
     box-shadow: 0 24px 48px var(--box-shadow);
     max-width: 900px;
-    width: 100%;
+    width: auto;
     box-sizing: border-box;
 
     color: var(--text-color);
@@ -75,17 +75,47 @@ h1 {
     line-height: 1.4;
 }
 
-/* Layout columns inside the app */
-#editor-container,
-#canvas-container,
-#diagnostics {
+#editor-container {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
-#theme {
+
+/* Canvas presentation */
+#canvas-container {
+    align-items: center;
+}
+
+#shader-canvas {
+    image-rendering: pixelated;
+    border: 1px solid var(--shader-border);
+    border-radius: 6px;
+    background-color: var(--shader-background);
+}
+
+/* Layout columns inside the app */
+#right-side-panel {
     display: flex;
-    flex-direction: column;
+    flex-direction: column;   /* side by side */
+    min-width: 120px;
+    max-width: 140px;
+}
+
+/* Diagnostics column */
+#diagnostics {
+    font-size: 0.8rem;
+    color: var(--diagnostics-color);
+}
+
+#diagnostics strong {
+    color: var(--strong-color);
+}
+
+#theme {
+    padding-top: 2rem;
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
     gap: 0.75rem;
 }
 
@@ -105,30 +135,6 @@ select {
     padding: 0.4rem 0.5rem;
     font-size: 0.9rem;
     min-width: 160px;
-}
-
-/* Canvas presentation */
-#canvas-container {
-    align-items: center;
-}
-
-#shader-canvas {
-    image-rendering: pixelated;
-    border: 1px solid var(--shader-border);
-    border-radius: 6px;
-    background-color: var(--shader-background);
-}
-
-/* Diagnostics column */
-#diagnostics {
-    min-width: 200px;
-    max-width: 220px;
-    font-size: 0.8rem;
-    color: var(--diagnostics-color);
-}
-
-#diagnostics strong {
-    color: var(--strong-color);
 }
 
 /* Responsive: stack columns on narrow screens */
