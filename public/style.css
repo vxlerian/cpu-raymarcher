@@ -160,7 +160,12 @@ select {
     align-items: center;
 }
 
+/*What the button looks like when clicked*/
 #theme-switch:active {
     transform: scale(0.98);   /* tiny press */
     filter: brightness(0.9);  /* darken a bit */
+}
+
+#theme-switch svg{
+    fill: var(--strong-color)
 }
