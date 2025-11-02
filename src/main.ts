@@ -14,7 +14,6 @@ const width = canvas.width;
 const height = canvas.height;
 
 const fpsDisplay = document.getElementById("fps")!;
-const statusDisplay = document.getElementById("status")!;
 
 const averageSDFCallsDisplay = document.getElementById("average-sdf-calls")!;
 const maxSDFCallsDisplay = document.getElementById("max-sdf-calls")!;
@@ -97,7 +96,6 @@ let displayScale = 1.0; // 1x = native internal size
 function applyCanvasScale() {
     canvas.style.width = `${width * displayScale}px`;
     canvas.style.height = `${height * displayScale}px`;
-    statusDisplay.textContent = `Status: scale ${displayScale.toFixed(2)}x`;
 }
 
 applyCanvasScale();
