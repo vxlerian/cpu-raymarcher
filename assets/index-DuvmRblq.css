@@ -1,1 +1,0 @@
-body{font-family:verdana,sans-serif;display:flex;flex-direction:column;align-items:left;margin:5%}#app{display:flex;gap:20px;margin-top:20px}#editor-container{display:flex;flex-direction:column}#shader-editor{width:400px;height:512px}#canvas-container canvas{border:1px solid black;image-rendering:pixelated}
