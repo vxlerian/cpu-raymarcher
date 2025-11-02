@@ -1,28 +1,123 @@
+/* Make the whole page center its content */
 body {
-    font-family: verdana, sans-serif;
+    margin: 0;
+    min-height: 100vh;
     display: flex;
-    flex-direction: column;
-    align-items: left;
-    margin: 5%
+    align-items: center;     
+    justify-content: center;  
+    background-color: #0f0f10;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, "Helvetica Neue", sans-serif;
+    color: #eaeaea;
 }
 
+/* Wrapper so the title + app stay grouped */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem; /* space between heading and app */
+}
+
+/* Optional: make the heading look a bit nicer */
+h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+}
+
+/* The main app panel */
 #app {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
+    flex-direction: row;
+    gap: 1.5rem;
+
+    background-color: #1a1a1f;
+    border: 1px solid #2a2a33;
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+
+    box-shadow: 0 24px 48px rgba(0,0,0,0.8);
+    max-width: 900px;
+    width: 100%;
+    box-sizing: border-box;
+
+    color: #eaeaea;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
-#editor-container {
+/* Layout columns inside the app */
+#editor-container,
+#canvas-container,
+#diagnostics {
     display: flex;
     flex-direction: column;
+    gap: 0.75rem;
 }
 
-#shader-editor {
-    width: 400px;
-    height: 512px;
+/* Style form controls a bit so dark mode isn't painful */
+label {
+    display: block;
+    font-size: 0.8rem;
+    color: #9ea0a8;
+    margin-bottom: 0.25rem;
 }
 
-#canvas-container canvas {
-    border: 1px solid black;
+select {
+    background-color: #2a2a33;
+    color: #fff;
+    border: 1px solid #3a3a45;
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9rem;
+    min-width: 160px;
+}
+
+/* Canvas presentation */
+#canvas-container {
+    align-items: center;
+}
+
+#shader-canvas {
     image-rendering: pixelated;
+    border: 1px solid #3a3a45;
+    border-radius: 6px;
+    background-color: #000;
+}
+
+/* Diagnostics column */
+#diagnostics {
+    min-width: 200px;
+    max-width: 220px;
+    font-size: 0.8rem;
+    color: #c5c6d0;
+}
+
+#diagnostics strong {
+    color: #fff;
+}
+
+/* Responsive: stack columns on narrow screens */
+@media (max-width: 800px) {
+    #app {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #diagnostics {
+        max-width: none;
+        min-width: 0;
+    }
+
+    #canvas-container {
+        align-items: flex-start;
+    }
+
+    #shader-canvas {
+        max-width: 100%;
+        height: auto;
+    }
 }

@@ -2,12 +2,16 @@ import { vec3 } from "gl-matrix";
 import { Scene } from "../util/scene";
 import { Raymarcher } from "./raymarcher";
 
-// Initially were 500, 0.02, 0.001 respectively but rendering took way too long
-const MAX_DIST = 10;
-const STEP_SIZE = 0.2;
-const EPSILON = 0.01;
+// Your tuned values
+const MAX_DIST   = 10;
+const STEP_SIZE  = 0.2;
+const EPSILON    = 0.01;
+
+// Derive loop bound from step size
+const MAX_STEPS = Math.ceil(MAX_DIST / STEP_SIZE);
 
 export class FixedStep extends Raymarcher {
+
     public runRaymarcher(
         scene: Scene,
         depthBuffer: Uint8ClampedArray,
@@ -18,96 +22,120 @@ export class FixedStep extends Raymarcher {
         height: number,
         time: number,
         yStart: number = 0,
-        yEnd: number = height): void
-    {
-        const MAX_STEPS = Math.ceil(MAX_DIST / STEP_SIZE);
+        yEnd: number = height
+    ): void {
 
-        const dir = vec3.create();
-        const p = vec3.create();
-        const origin = vec3.create();
+        // temp vectors reused per pixel
+        const rayDir = vec3.create();     // ray direction (world == camera == origin coords here)
+        const samplePos = vec3.create();  // p along the ray
 
-        // Loop over pixels
+        // Loop over pixel rows
         for (let y = yStart; y < yEnd; y++) {
             const localY = y - yStart;
+
+            // same normalized coords style as SphereTracer
             const v = y / height - 0.5;
 
+            // Loop over columns
             for (let x = 0; x < width; x++) {
                 const u = x / width - 0.5;
 
-                // ---- 1️⃣ Ray setup ----
-                vec3.set(dir, u, v, -1);
-                vec3.normalize(dir, dir);
+                // ---------------------------------
+                // 1. Ray setup (match SphereTracer)
+                // ---------------------------------
+                // direction = normalize([u, v, -1])
+                vec3.set(rayDir, u, v, -1);
+                vec3.normalize(rayDir, rayDir);
 
-                // Rotate direction by camera
-                scene.camera.transformDirection(dir, dir);
-                vec3.normalize(dir, dir);
+                // origin is implicitly (0,0,0)
+                // so any point on the ray is rayDir * t
 
-                // Camera world position
-                scene.camera.getPosition(origin);
-
-                // ---- 2️⃣ Raymarch ----
-                let t = 0;
+                // ---------------------------------
+                // 2. March forward in FIXED steps
+                // ---------------------------------
+                let t = 0.0;
                 let steps = 0;
                 let sdfCalls = 0;
                 let hit = false;
 
                 for (; steps < MAX_STEPS && t <= MAX_DIST; steps++, t += STEP_SIZE) {
-                    // p = origin + dir * t
-                    p[0] = origin[0] + dir[0] * t;
-                    p[1] = origin[1] + dir[1] * t;
-                    p[2] = origin[2] + dir[2] * t;
+                    // samplePos = origin + rayDir * t
+                    samplePos[0] = rayDir[0] * t;
+                    samplePos[1] = rayDir[1] * t;
+                    samplePos[2] = rayDir[2] * t;
 
-                    let d = MAX_DIST;
+                    // distance to closest SDF primitive at this point
+                    let distToScene = MAX_DIST;
                     for (const prim of scene.objectSDFs) {
-                        const s = prim.sdf(p);
-                        if (s < d) d = s;
+                        const d = prim.sdf(samplePos);
+                        if (d < distToScene) distToScene = d;
                         sdfCalls++;
                     }
 
-                    if (d < EPSILON) {
+                    // consider it a hit if we're within EPSILON of surface
+                    if (distToScene < EPSILON) {
                         hit = true;
                         break;
                     }
                 }
 
-                // ---- 3️⃣ Write outputs ----
+                // ---------------------------------
+                // 3. Write out buffers
+                // ---------------------------------
                 const idx = localY * width + x;
+                const normalIdx = idx * 3;
 
-                const depth = Math.min(t, MAX_DIST);
-                depthBuffer[idx] = Math.round(255 * depth / MAX_DIST);
+                // iterations + SDF eval counts for debug
                 iterationsBuffer[idx] = steps;
                 SDFevaluationBuffer[idx] = sdfCalls;
 
+                // depth:
+                // we map t (0..MAX_DIST) -> byte (0..255)
+                const clampedT = Math.min(t, MAX_DIST);
+                const depthByte = Math.round((clampedT / MAX_DIST) * 255);
+                depthBuffer[idx] = depthByte;
+
                 if (hit) {
-                    const n = this.getNormal(scene, p);
-                    normalBuffer[idx * 3 + 0] = Math.round((n[0] * 0.5 + 0.5) * 255);
-                    normalBuffer[idx * 3 + 1] = Math.round((n[1] * 0.5 + 0.5) * 255);
-                    normalBuffer[idx * 3 + 2] = Math.round((n[2] * 0.5 + 0.5) * 255);
+                    // estimate normal at hit point
+                    const n = this.getNormal(scene, samplePos);
+                    normalBuffer[normalIdx + 0] = Math.round((n[0] * 0.5 + 0.5) * 255);
+                    normalBuffer[normalIdx + 1] = Math.round((n[1] * 0.5 + 0.5) * 255);
+                    normalBuffer[normalIdx + 2] = Math.round((n[2] * 0.5 + 0.5) * 255);
                 } else {
-                    // Flat sky/neutral color if no hit
-                    normalBuffer[idx * 3 + 0] = 127;
-                    normalBuffer[idx * 3 + 1] = 127;
-                    normalBuffer[idx * 3 + 2] = 255;
+                    // miss / background
+                    normalBuffer[normalIdx + 0] = 127;
+                    normalBuffer[normalIdx + 1] = 127;
+                    normalBuffer[normalIdx + 2] = 255;
                 }
             }
         }
     }
 
+    // same helper logic as before, but without touching debug counters
     private getSceneDistance(scene: Scene, position: vec3): number {
         let closestDistance = MAX_DIST;
         for (const primitive of scene.objectSDFs) {
-            closestDistance = Math.min(primitive.sdf(position), closestDistance);
+            const d = primitive.sdf(position);
+            if (d < closestDistance) closestDistance = d;
         }
         return closestDistance;
     }
 
     private getNormal(scene: Scene, position: vec3): vec3 {
-        let d = this.getSceneDistance(scene, position);
-        const e = [0.01, 0, 0];
-        const n = vec3.create();
-        n[0] = d - this.getSceneDistance(scene, vec3.fromValues(position[0] - e[0], position[1], position[2]));
-        n[1] = d - this.getSceneDistance(scene, vec3.fromValues(position[0], position[1] - e[0], position[2]));
-        n[2] = d - this.getSceneDistance(scene, vec3.fromValues(position[0], position[1], position[2] - e[0]));
+        // gradient approx
+        const eps = 0.01;
+
+        const d0 = this.getSceneDistance(scene, position);
+
+        const px = vec3.fromValues(position[0] - eps, position[1], position[2]);
+        const py = vec3.fromValues(position[0], position[1] - eps, position[2]);
+        const pz = vec3.fromValues(position[0], position[1], position[2] - eps);
+
+        const nx = d0 - this.getSceneDistance(scene, px);
+        const ny = d0 - this.getSceneDistance(scene, py);
+        const nz = d0 - this.getSceneDistance(scene, pz);
+
+        const n = vec3.fromValues(nx, ny, nz);
         vec3.normalize(n, n);
         return n;
     }
