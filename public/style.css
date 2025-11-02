@@ -1,17 +1,4 @@
 :root {
-    --background: #0f0f10;
-    --app-background: #1a1a1f;
-    --app-border: #2a2a33;
-    --strong-color: white;
-    --text-color: #eaeaea;
-    --label-color: #9ea0a8;
-    --shader-background: black;
-    --shader-border: #3a3a45;
-    --box-shadow: rgba(0,0,0,0.8);
-    --diagnostics-color: #c5c6d0;
-}
-
-.light-mode {
     --background: #f5f6fa;
     --app-background: #ffffff;
     --app-border: #d7d9e2;
@@ -22,6 +9,19 @@
     --shader-border: #c6c8d6;
     --box-shadow: rgba(0, 0, 0, 0.08); 
     --diagnostics-color: #3a3d4a;   
+}
+
+.dark-mode {
+    --background: #0f0f10;
+    --app-background: #1a1a1f;
+    --app-border: #2a2a33;
+    --strong-color: white;
+    --text-color: #eaeaea;
+    --label-color: #9ea0a8;
+    --shader-background: black;
+    --shader-border: #3a3a45;
+    --box-shadow: rgba(0,0,0,0.8);
+    --diagnostics-color: #c5c6d0;
 }
 
 /* Make the whole page center its content */
@@ -168,4 +168,19 @@ select {
 
 #theme-switch svg{
     fill: var(--strong-color)
+}
+
+/* Hide the dark mode icon in light mode (default) */
+#theme-switch svg:last-child {
+    display: none;
+}
+
+/* In dark mode, show the dark mode icon and hide the light mode icon,
+which correspond to the first and last child respectively*/
+.dark-mode #theme-switch svg:first-child {
+    display: none;
+}
+
+.dark-mode #theme-switch svg:last-child {
+    display: block;
 }
