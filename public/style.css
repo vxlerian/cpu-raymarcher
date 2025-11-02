@@ -83,6 +83,11 @@ h1 {
     flex-direction: column;
     gap: 0.75rem;
 }
+#theme {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
 
 /* Style form controls a bit so dark mode isn't painful */
 label {

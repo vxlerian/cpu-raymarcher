@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <title>CPU Shader Tester</title>
     <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="src/website_elements/theme_switch.ts" defer>
+    </script>
 </head>
 <body>
     <div class="page-wrapper">
@@ -44,7 +46,17 @@
             </div>
 
             <div id="diagnostics">
-                <button id="theme-switch">
+                <p style="margin-top: 0px;" id="fps">Frame length: 0</p>
+                <p id="status">Status: idk</p>
+                <div style="margin-top: 10px; font-size: 0.9em;">
+                    <strong>Controls:</strong><br>
+                    Arrow keys: Camera<br>
+                    -/+: Scale display<br>
+                </div>
+
+            </div>
+            <div id="theme">
+                                <button id="theme-switch">
                     <!--Light and dark mode icons (in that order)-->
                     <svg 
                         xmlns="http://www.w3.org/2000/svg" 
@@ -78,14 +90,6 @@
                         "
                     /></svg>
                 </button>
-                <p style="margin-top: 0px;" id="fps">Frame length: 0</p>
-                <p id="status">Status: idk</p>
-                <div style="margin-top: 10px; font-size: 0.9em;">
-                    <strong>Controls:</strong><br>
-                    Arrow keys: Camera<br>
-                    -/+: Scale display<br>
-                </div>
-
             </div>
         </div>
     </div>
