@@ -14,6 +14,7 @@ const disabledarkMode = () => {
 
 const mainFunc = () => {
     let darkMode = sessionStorage.getItem('dark-mode')
+    // Persistant
     if (darkMode === 'active') enabledarkMode()
     const themeSwitch = document.getElementById('theme-switch')
     if (themeSwitch === null) return
