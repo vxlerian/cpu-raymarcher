@@ -1,11 +1,11 @@
 import { Raymarcher } from './raymarcher'
 
 const MAX_STEPS = 100;
-const MAX_DIST = 500;
+const MAX_DIST = 10;
 const EPSILON = 0.001;
 
 import { Scene } from '../util/scene';
-import { vec3 } from 'gl-matrix';
+import { mat3, mat4, vec3 } from 'gl-matrix';
 
 export class SphereTracer extends Raymarcher {
     public runRaymarcher(
@@ -18,34 +18,49 @@ export class SphereTracer extends Raymarcher {
         height: number,
         time: number,
         yStart: number = 0,
-        yEnd: number = height): void
-    {
+        yEnd: number = height
+    ): void {
+        // --- get camera transforms once ---
+        const rotMat4 = scene.camera.getRotationMatrix(mat4.create());
+        const rotMat3 = mat3.create();
+        mat3.fromMat4(rotMat3, rotMat4);
+
+        const rayOrigin = vec3.create();
+        scene.camera.getPosition(rayOrigin);
+
         for (let y = yStart; y < yEnd; y++) {
             const localY = y - yStart;
-            const v = y / height - 0.5;
+            const v = (y / height - 0.5) * 2.0; // normalized screen space
 
             for (let x = 0; x < width; x++) {
-                const idx = (localY * width + x);
+                const idx = localY * width + x;
                 const normalIdx = idx * 3;
 
                 SDFevaluationBuffer[idx] = 0;
                 iterationsBuffer[idx] = 0;
 
-                const rayDir = vec3.create();
-                const u = x / width - 0.5;
-                vec3.normalize(rayDir, vec3.fromValues(
-                    u,
-                    v,
-                    -1
-                ));
-                const depth = this.rayMarch(scene, rayDir, idx, SDFevaluationBuffer, iterationsBuffer);
-                // const depth = this.getSceneDistance(scene, rayDir);
+                // --- compute ray direction in view space ---
+                const u = (x / width - 0.5) * 2.0;
+                const rayDir = vec3.fromValues(u, v, -1);
 
-                const position = vec3.create();
-                vec3.scale(position, rayDir, depth);
-                const normal = this.getNormal(scene, position, idx, SDFevaluationBuffer);
+                // --- rotate ray by camera rotation (not multiply!) ---
+                vec3.transformMat3(rayDir, rayDir, rotMat3);
+                vec3.normalize(rayDir, rayDir);
 
-                normalBuffer[normalIdx] = (normal[0] + 1) * 0.5 * 255;
+                // --- perform raymarch ---
+                const depth = this.rayMarch(scene, rayOrigin, rayDir, idx, SDFevaluationBuffer, iterationsBuffer);
+
+                // --- compute hit normal (unchanged) ---
+                const hitPosition = vec3.create();
+                vec3.scaleAndAdd(hitPosition, rayOrigin, rayDir, depth);
+
+                let normal;
+                if (depth >= MAX_DIST) {
+                    normal = vec3.fromValues(0, 0, 0);
+                } else {
+                    normal = this.getNormal(scene, hitPosition, idx, SDFevaluationBuffer);
+                }
+                normalBuffer[normalIdx]     = (normal[0] + 1) * 0.5 * 255;
                 normalBuffer[normalIdx + 1] = (normal[1] + 1) * 0.5 * 255;
                 normalBuffer[normalIdx + 2] = (normal[2] + 1) * 0.5 * 255;
                 depthBuffer[idx] = depth;
@@ -84,24 +99,28 @@ export class SphereTracer extends Raymarcher {
 
     private rayMarch(
         scene: Scene,
+        rayOrigin: vec3,
         direction: vec3,
         idx: number,
         SDFevaluationBuffer: Uint16Array,
         iterationsBuffer: Uint16Array,
     ): number {
-        let d = 0;
+        let totalDist = 0;
 
         for (let i = 0; i < MAX_STEPS; i++) {
-            const p = vec3.fromValues(0, 0, 0);
-            vec3.scale(p, direction, d);
-            let ds = this.getSceneDistance(scene, p, idx, SDFevaluationBuffer);
-            d += ds;
-            if (d > MAX_DIST || ds < EPSILON) {
-                break;  // hit object or out of scene
-            }
+            const p = vec3.create();
+            vec3.scaleAndAdd(p, rayOrigin, direction, totalDist);
+
+            const dist = this.getSceneDistance(scene, p, idx, SDFevaluationBuffer);
+            totalDist += dist;
 
             iterationsBuffer[idx] += 1;
+
+            // --- termination conditions ---
+            if (dist < EPSILON) break; // hit surface
+            if (totalDist > MAX_DIST) break; // too far
         }
-        return Math.min(d, 255);
+
+        return totalDist;
     }
 }

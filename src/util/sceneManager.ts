@@ -89,9 +89,9 @@ export class SceneManager {
         {
             name: "Pyramid of Boxes",
             objects: [
-                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
+                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
                 SceneManager.createBox(0, 0, 0, vec3.fromValues(0.6, 0.25, 0.6)),
-                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
+                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
             ]
         },
         {

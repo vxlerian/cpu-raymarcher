@@ -11,7 +11,7 @@ export class Camera {
 
     constructor() {
         this.orbitCentre = mat4.create();
-        this.cameraDistance = 5;
+        this.cameraDistance = 3;
         this.pitch = 0;
         this.yaw = 0;
         this.cameraTransform = mat4.create();
@@ -33,6 +33,26 @@ export class Camera {
     // helpers to serialise/restore orientation (used by worker renderer)
     public getAngles(): [number, number] {
         return [this.pitch, this.yaw];
+    }
+
+    public getRotationMatrix(out: mat4): mat4 {
+        out[0] = this.cameraTransform[0]; out[1] = this.cameraTransform[1]; out[2] = this.cameraTransform[2]; out[3] = 0;
+        out[4] = this.cameraTransform[4]; out[5] = this.cameraTransform[5]; out[6] = this.cameraTransform[6]; out[7] = 0;
+        out[8] = this.cameraTransform[8]; out[9] = this.cameraTransform[9]; out[10] = this.cameraTransform[10]; out[11] = 0;
+        out[12] = 0; out[13] = 0; out[14] = 0; out[15] = 1;
+        return out;
+    }
+
+    public getCameraPosition(out: vec3): vec3 {
+        out[0] = this.cameraTransform[12];
+        out[1] = this.cameraTransform[13];
+        out[2] = this.cameraTransform[14];
+        return out;
+    }
+
+    public getCameraMatrix(out: mat4): mat4 {
+        mat4.copy(out, this.cameraTransform);
+        return out;
     }
 
     public setAngles(pitch: number, yaw: number) {

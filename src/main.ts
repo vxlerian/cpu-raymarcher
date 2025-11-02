@@ -160,8 +160,6 @@ async function render(time: number) {
     fpsDisplay.textContent = `Frame length: ${(now - lastFrame).toPrecision(4)}`;
     lastFrame = now;
 
-    scene.updateInverseSceneTransforms();
-
     requestAnimationFrame(render);
 }
 
@@ -187,7 +185,6 @@ window.addEventListener("keydown", e => {
 });
 function onPan(dx: number, dy: number) {
     scene.camera.rotateCamera(-dy, dx);
-    scene.updateInverseSceneTransforms();
 }
 
 requestAnimationFrame(render);

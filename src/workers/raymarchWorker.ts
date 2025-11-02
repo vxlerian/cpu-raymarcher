@@ -31,7 +31,6 @@ self.onmessage = (e: MessageEvent<Job>) => {
   const scene = new Scene();
   scene.loadPreset(scenePresetIndex); // Load the current scene
   scene.camera.setAngles(camera.pitch, camera.yaw);
-  scene.updateInverseSceneTransforms();
 
   // Allocate tile-local buffers
   const tileHeight = Math.max(0, yEnd - yStart);

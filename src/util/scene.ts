@@ -46,9 +46,4 @@ export class Scene {
         };
     }
 
-    updateInverseSceneTransforms() {
-        for (const primitive of this.objectSDFs) {
-            primitive.updateInverseSceneTransform(this.camera.cameraTransform);
-        }
-    }
 }
