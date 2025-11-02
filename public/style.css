@@ -11,6 +11,19 @@
     --diagnostics-color: #c5c6d0;
 }
 
+.light-mode {
+    --background: #f5f6fa;
+    --app-background: #ffffff;
+    --app-border: #d7d9e2;
+    --strong-color: #000000;
+    --text-color: #1a1a1f;
+    --label-color: #5a5e6e;
+    --shader-background: #ffffff;
+    --shader-border: #c6c8d6;
+    --box-shadow: rgba(0, 0, 0, 0.08); 
+    --diagnostics-color: #3a3d4a;   
+}
+
 /* Make the whole page center its content */
 body {
     margin: 0;
@@ -37,7 +50,7 @@ h1 {
     margin: 0;
     font-size: 1.4rem;
     font-weight: 600;
-    color: #fff;
+    color: var(--strong-color);
     text-align: left;
 }
 
