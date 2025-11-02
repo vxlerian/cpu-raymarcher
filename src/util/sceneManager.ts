@@ -30,13 +30,13 @@ export class SceneManager {
 
     public static readonly presets: Scene[] = [
         {
-            name: "Single sphere",
+            name: "Sphere",
             objects: [
                 SceneManager.createSphere(0, 0, 0, 1.5)
             ]
         },
         {
-            name: "Grid of spheres",
+            name: "Grid of Spheres",
             objects: [
                 SceneManager.createSphere(-1, -1, 0, 0.3),
                 SceneManager.createSphere(0, -1, 0, 0.3),
@@ -62,7 +62,7 @@ export class SceneManager {
             ]
         },
         {
-            name: "Random spheres",
+            name: "Random Spheres",
             objects: [
                 SceneManager.createSphere(0.8, -0.3, 0.2, 0.4),
                 SceneManager.createSphere(-0.5, 0.9, -0.1, 0.5),
