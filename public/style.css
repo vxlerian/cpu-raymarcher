@@ -1,3 +1,16 @@
+:root {
+    --background: #0f0f10;
+    --app-background: #1a1a1f;
+    --app-border: #2a2a33;
+    --strong-color: white;
+    --text-color: #eaeaea;
+    --label-color: #9ea0a8;
+    --shader-background: black;
+    --shader-border: #3a3a45;
+    --box-shadow: rgba(0,0,0,0.8);
+    --diagnostics-color: #c5c6d0;
+}
+
 /* Make the whole page center its content */
 body {
     margin: 0;
@@ -5,10 +18,10 @@ body {
     display: flex;
     align-items: center;     
     justify-content: center;  
-    background-color: #0f0f10;
+    background-color: var(--background);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
                  Roboto, "Helvetica Neue", sans-serif;
-    color: #eaeaea;
+    color: var(--text-color);
 }
 
 /* Wrapper so the title + app stay grouped */
@@ -19,13 +32,13 @@ body {
     gap: 1rem; /* space between heading and app */
 }
 
-/* Optional: make the heading look a bit nicer */
+/* TODO: make the heading look a bit nicer */
 h1 {
     margin: 0;
     font-size: 1.4rem;
     font-weight: 600;
     color: #fff;
-    text-align: center;
+    text-align: left;
 }
 
 /* The main app panel */
@@ -34,17 +47,17 @@ h1 {
     flex-direction: row;
     gap: 1.5rem;
 
-    background-color: #1a1a1f;
-    border: 1px solid #2a2a33;
+    background-color: var(--app-background);
+    border: 1px solid var(--app-border);
     border-radius: 12px;
     padding: 1.25rem 1.5rem;
 
-    box-shadow: 0 24px 48px rgba(0,0,0,0.8);
+    box-shadow: 0 24px 48px var(--box-shadow);
     max-width: 900px;
     width: 100%;
     box-sizing: border-box;
 
-    color: #eaeaea;
+    color: var(--text-color);
     font-size: 0.9rem;
     line-height: 1.4;
 }
@@ -62,14 +75,14 @@ h1 {
 label {
     display: block;
     font-size: 0.8rem;
-    color: #9ea0a8;
+    color: var(--label-color);
     margin-bottom: 0.25rem;
 }
 
 select {
-    background-color: #2a2a33;
-    color: #fff;
-    border: 1px solid #3a3a45;
+    background-color: var(--app-border);
+    color: var(--strong-color);
+    border: 1px solid var(--shader-border);
     border-radius: 6px;
     padding: 0.4rem 0.5rem;
     font-size: 0.9rem;
@@ -83,9 +96,9 @@ select {
 
 #shader-canvas {
     image-rendering: pixelated;
-    border: 1px solid #3a3a45;
+    border: 1px solid var(--shader-border);
     border-radius: 6px;
-    background-color: #000;
+    background-color: var(--shader-background);
 }
 
 /* Diagnostics column */
@@ -93,11 +106,11 @@ select {
     min-width: 200px;
     max-width: 220px;
     font-size: 0.8rem;
-    color: #c5c6d0;
+    color: var(--diagnostics-color);
 }
 
 #diagnostics strong {
-    color: #fff;
+    color: var(--strong-color);
 }
 
 /* Responsive: stack columns on narrow screens */
