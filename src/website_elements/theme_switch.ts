@@ -4,22 +4,22 @@
 
 const enabledarkMode = () => {
     document.body.classList.add('dark-mode')
-    localStorage.setItem('dark-mode', 'active')
+    sessionStorage.setItem('dark-mode', 'active')
 }
 
 const disabledarkMode = () => {
     document.body.classList.remove('dark-mode')
-    localStorage.setItem('dark-mode', 'inactive')
+    sessionStorage.setItem('dark-mode', 'inactive')
 }
 
 const mainFunc = () => {
-    let darkMode = localStorage.getItem('dark-mode')
+    let darkMode = sessionStorage.getItem('dark-mode')
     if (darkMode === 'active') enabledarkMode()
     const themeSwitch = document.getElementById('theme-switch')
     if (themeSwitch === null) return
 
     themeSwitch.addEventListener("click", () => {
-        darkMode = localStorage.getItem('dark-mode')
+        darkMode = sessionStorage.getItem('dark-mode')
         darkMode !== "active" ? enabledarkMode() : disabledarkMode()
     })
 }
