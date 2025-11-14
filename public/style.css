@@ -64,6 +64,14 @@ h1 {
     align-self: flex-start;   /* top-left */
 }
 
+.view {
+    display: none;
+}
+
+.view.active-view {
+    display: flex;
+}
+
 /* The main app panel */
 #app {
     display: flex;
