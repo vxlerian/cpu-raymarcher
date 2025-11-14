@@ -74,6 +74,7 @@ const scene = new Scene();
 
 // Scene dropdown setup
 const sceneSelect = document.getElementById('scene-select') as HTMLSelectElement;
+const analyticsSceneSelect = document.getElementById('analytics-scene-select') as HTMLSelectElement | null;
 
 // Handle scene dropdown changes
 sceneSelect.addEventListener('change', (e) => {
@@ -84,6 +85,30 @@ sceneSelect.addEventListener('change', (e) => {
 // Initialise dropdown with current scene
 const sceneInfo = scene.getCurrentPresetInfo();
 SceneManager.populateSceneDropdown(sceneSelect, sceneInfo.index);
+if (analyticsSceneSelect) {
+    SceneManager.populateSceneDropdown(analyticsSceneSelect, sceneInfo.index);
+}
+
+function handleSceneChange(index: number) {
+    scene.loadPreset(index);
+    sceneSelect.value = String(index);
+    if (analyticsSceneSelect) {
+        analyticsSceneSelect.value = String(index);
+    }
+}
+
+// Handle scene dropdown changes
+sceneSelect.addEventListener('change', (e) => {
+    const selectedIndex = parseInt((e.target as HTMLSelectElement).value);
+    handleSceneChange(selectedIndex);
+});
+
+if (analyticsSceneSelect) {
+    analyticsSceneSelect.addEventListener('change', (e) => {
+        const selectedIndex = parseInt((e.target as HTMLSelectElement).value);
+        handleSceneChange(selectedIndex);
+    });
+}
 
 // Worker pool
 const NUM_WORKERS = Math.max(1, Math.min(4, (navigator.hardwareConcurrency || 4) - 1));
@@ -113,11 +138,11 @@ applyCanvasScale();
 // Main render loop
 async function render(time: number) {
     // Check if analytics is active, enabling auto rotation if so.
-    const analyticsView = document.getElementById("analytic-view");
+    const analyticsView = document.getElementById("analytics-view");
     const isAnalyticsActive = analyticsView?.classList.contains("active-view");
     if (isAnalyticsActive) {
         const rotationSpeed = 0.01;
-        scene.camera.rotateCamera(rotationSpeed, 0);
+        scene.camera.rotateCamera(0, rotationSpeed);
     }
     
     // Partition rows across workers
@@ -170,7 +195,6 @@ async function render(time: number) {
 
     const imageData = new ImageData(outputBuffer, width, height);
     ctx.putImageData(imageData, 0, 0);
-
     if (analyticsCtx) {
         analyticsCtx.putImageData(imageData, 0, 0);
     }
