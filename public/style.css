@@ -102,8 +102,9 @@ h1 {
 
 /* Active tab: underlined and a bit bolder */
 .selection-btn.active {
-    background-color: var(--label-color);
-    font-weight: 600;
+    background-color: var(--app-border);
+    font-weight: 520;
+    text-decoration: underline;
 }
 
 .view {
@@ -216,6 +217,71 @@ select {
     #shader-canvas {
         max-width: 100%;
         height: auto;
+    }
+}
+
+/* Analytics main panel */
+#analytics-app {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+
+    background-color: var(--app-background);
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+
+    box-shadow: 0 24px 48px var(--box-shadow);
+    max-width: 900px;
+    width: auto;
+    box-sizing: border-box;
+
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+/* Left column: options + canvas stacked */
+.analytics-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Make the options menu a bit more compact */
+.analytics-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+}
+
+/* Canvas under controls */
+.analytics-canvas-container {
+    margin-top: 0.5rem;
+}
+
+#analytics-canvas {
+    image-rendering: pixelated;
+    border: 1px solid var(--shader-border);
+    border-radius: 6px;
+    background-color: var(--shader-background);
+}
+
+/* Empty right-hand side for future analytics content */
+.analytics-right-placeholder {
+    flex: 1;
+}
+
+/* Optional: responsive behaviour similar to #app */
+@media (max-width: 800px) {
+    #analytics-app {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .analytics-right-placeholder {
+        min-height: 0;
     }
 }
 
