@@ -9,8 +9,9 @@ import { SDFHeatmap } from './util/shading_models/SDFHeatmap';
 import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
-const analyticsCanvas = document.getElementById("analytics-canvas") as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!;
+const analyticsCanvas = document.getElementById("analytics-canvas") as HTMLCanvasElement
+const analyticsCtx = analyticsCanvas ? analyticsCanvas.getContext("2d")! : null;
 const width = canvas.width;
 const height = canvas.height;
 
@@ -111,6 +112,14 @@ applyCanvasScale();
 
 // Main render loop
 async function render(time: number) {
+    // Check if analytics is active, enabling auto rotation if so.
+    const analyticsView = document.getElementById("analytic-view");
+    const isAnalyticsActive = analyticsView?.classList.contains("active-view");
+    if (isAnalyticsActive) {
+        const rotationSpeed = 0.01;
+        scene.camera.rotateCamera(rotationSpeed, 0);
+    }
+    
     // Partition rows across workers
     const rowsPerWorker = Math.ceil(height / NUM_WORKERS);
     const [pitch, yaw] = scene.camera.getAngles();
@@ -161,6 +170,10 @@ async function render(time: number) {
 
     const imageData = new ImageData(outputBuffer, width, height);
     ctx.putImageData(imageData, 0, 0);
+
+    if (analyticsCtx) {
+        analyticsCtx.putImageData(imageData, 0, 0);
+    }
 
     // FPS calculation
     const now = performance.now();
