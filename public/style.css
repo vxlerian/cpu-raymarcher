@@ -80,14 +80,30 @@ h1 {
 .selection-btn {
     padding: 0.4rem 0.9rem;
     border-radius: 999px;
-    border: none;
-    background-color: var(--background);
+    border: 1px solid var(--app-border);
+    background-color: var(--app-background);
     color: var(--text-color);
     font-size: 0.9rem;
     cursor: pointer;
 
     border-bottom: 2px solid transparent;
     /* transition: background-color 0.15s ease, border-bottom-color 0.15s ease; */
+}
+
+/* Hover state for non-active tab */
+.selection-btn:hover:not(.active) {
+    border-bottom-color: rgba(0, 0, 0, 0.04);  /* subtle, not bright white */
+}
+
+/* Slightly different hover in dark mode */
+.dark-mode .selection-btn:hover:not(.active) {
+    border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Active tab: underlined and a bit bolder */
+.selection-btn.active {
+    background-color: var(--label-color);
+    font-weight: 600;
 }
 
 .view {
