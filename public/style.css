@@ -39,21 +39,6 @@ body {
     color: var(--text-color);
 }
 
-/* Wrapper so the title + app stay grouped */
-.page-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem; /* space between heading and app */
-}
-
-#page-selection {
-    margin-top: 4rem;
-    display: flex;
-    flex-direction: row;
-    gap: 0.75rem;
-}
-
 .top-bar {
     position: fixed;
     top: 0;
@@ -75,6 +60,21 @@ h1 {
     font-size: 1.4rem;
     font-weight: 600;
     color: var(--strong-color);
+}
+
+/* Wrapper so the title + app stay grouped */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem; /* space between heading and app */
+}
+
+#page-selection {
+    margin-top: 4rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
 }
 
 .view {
