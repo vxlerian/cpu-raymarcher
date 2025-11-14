@@ -9,9 +9,15 @@ import { SDFHeatmap } from './util/shading_models/SDFHeatmap';
 import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
+const analyticsCanvas = document.getElementById("analytics-canvas") as HTMLCanvasElement
 const ctx = canvas.getContext("2d")!;
 const width = canvas.width;
 const height = canvas.height;
+
+if (analyticsCanvas) {
+    analyticsCanvas.width = width;
+    analyticsCanvas.height = height;
+}
 
 const fpsDisplay = document.getElementById("fps")!;
 
@@ -96,8 +102,11 @@ let displayScale = 1.0; // 1x = native internal size
 function applyCanvasScale() {
     canvas.style.width = `${width * displayScale}px`;
     canvas.style.height = `${height * displayScale}px`;
+    if (analyticsCanvas) {
+        analyticsCanvas.style.width = `${width * displayScale}px`;
+        analyticsCanvas.style.height = `${height * displayScale}px`;
+    }
 }
-
 applyCanvasScale();
 
 // Main render loop
