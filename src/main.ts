@@ -140,11 +140,10 @@ applyCanvasScale();
 
 // Graph data/options (using ApexCharts)
 // First, we'll just try with SDF calls.
-let y_data: number[] = []
-let x_data: number[] = []
+let data: [number, number][] = []
 
 var options = {
-    series: y_data,
+    series: data,
     chart: {
         id: 'realtime',
         height: 350,
@@ -163,7 +162,7 @@ var options = {
     stroke: { curve: 'smooth' },
     title: { text: 'Average SDF Calls', align: 'left' },
     markers: { size: 0 },
-    // xaxis: { categories: x_data },
+    xaxis: { range: 1000 },
     yaxis: { max: 20 },
     legend: { show: false },
 };
@@ -268,12 +267,13 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
-    console.log(y_data.length)
-    if (y_data.length == 1000) {
-        y_data.pop();
+    data.push([now, averageSDFCalls]);
+    if (data.length > 100) {
+        data.shift();
     }
-    y_data.push(averageSDFCalls);
-    chart.updateSeries([{data: y_data}]);
+    chart.updateSeries([{data: data}]);
+    
+    // window.setInterval()
 
     chart.render();
 
