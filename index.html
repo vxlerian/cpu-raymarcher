@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> i
     <title>CPU Shader Tester</title>
     <link rel="stylesheet" href="src/styles/style.css">
     <script type="module" src="src/website_elements/theme_switch.ts" defer>
@@ -69,6 +70,16 @@
                 -->
             </div>
             
+            <!-- For mobile users only -->
+            <div id="dpad">
+                <p>Rotate camera</p>
+                <button id="left">←</button>
+                <button id="up">↑</button>
+                <button id="down">↓</button>
+                <button id="right">→</button>
+            </div>
+
+            <!-- Performance metrics & controls guide -->
             <div id="right-side-panel">
                 <p><b>Performance Metrics</b></p>
                 <div id="diagnostics">

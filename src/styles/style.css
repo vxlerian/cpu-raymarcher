@@ -56,6 +56,7 @@
         justify-content: space-between;
         align-items: center;
         width: 100%;
+        margin-top: 12px;
     }
 
     #theme {
@@ -112,6 +113,11 @@
         background-color: var(--shader-background);
     }
     
+    /* DPAD is for mobile users only */
+    #dpad {
+        display: none;
+    }
+
     /* Layout columns inside the app */
     #right-side-panel {
         display: flex;
@@ -246,6 +252,52 @@
         border: 1px solid var(--shader-border);
         border-radius: 6px;
         background-color: var(--shader-background);
+    }
+
+    /* Mobile DPAD */
+    #dpad {
+        width: 200px;
+        height: 100%;
+        display: grid;
+        margin-left: auto;
+        margin-right: auto;
+        place-items: center center;
+    }
+
+    #dpad > button {
+        width: 64px;
+        height: 64px;
+        background-color: var(--background);
+        color: var(--text-color);
+        border-color: var(--app-background);
+        border-radius: 6px;
+    }
+
+    #dpad > p {
+        grid-row-start: 2;
+        grid-column-start: 2;
+        align-items: center;
+        text-align: center;
+    }
+
+    button#left {
+        grid-row-start: 2;
+        grid-column-start: 1;
+    }
+
+    button#up {
+        grid-row-start: 1;
+        grid-column-start: 2;
+    }
+
+    button#down {
+        grid-row-start: 3;
+        grid-column-start: 2;
+    }
+
+    button#right {
+        grid-row-start: 2;
+        grid-column-start: 3;
     }
 
     /* Layout columns inside the app */
