@@ -31,6 +31,7 @@ const minSDFCallsDisplay = document.getElementById("min-sdf-calls")!;
 const averageIterationsDisplay = document.getElementById("average-iterations")!;
 
 let shadingModel: ShadingModel = new NormalModel();
+let analyticsShadingModel: ShadingModel = new NormalModel(); // analytics shader (default)
 // Changing model
 document.getElementById('shading-models')!.addEventListener('change', e => {
     const selectedModel = (e.target as HTMLSelectElement).value;
@@ -51,6 +52,30 @@ document.getElementById('shading-models')!.addEventListener('change', e => {
             shadingModel = new NormalModel();
     }
 });
+
+const analyticsShadingSelect = document.getElementById('analytics-shading-model') as HTMLSelectElement | null;
+
+if (analyticsShadingSelect) {
+    analyticsShadingSelect.addEventListener('change', e => {
+        const selectedModel = (e.target as HTMLSelectElement).value;
+        switch (selectedModel) {
+            case 'phong':
+                analyticsShadingModel = new PhongModel();
+                break;
+            case 'normal':
+                analyticsShadingModel = new NormalModel();
+                break;
+            case 'sdf-heatmap':
+                analyticsShadingModel = new SDFHeatmap();
+                break;
+            case 'iteration-heatmap':
+                analyticsShadingModel = new IterationHeatmap();
+                break;
+            default:
+                analyticsShadingModel = new NormalModel();
+        }
+    });
+}
 
 // Getting algorithm
 let algorithm = 'sphere-tracer';
@@ -152,6 +177,7 @@ const normalBuffer = new Uint8ClampedArray(width * height * 3);
 const SDFevaluationBuffer = new Uint16Array(width * height);
 const iterationsBuffer = new Uint16Array(width * height);
 const outputBuffer = new Uint8ClampedArray(width * height * 4); // RGBA
+const analyticsOutputBuffer = new Uint8ClampedArray(width * height * 4);
 
 // Display scaling: keep internal resolution (width x height), scale via CSS only
 let displayScale = 1.0; // 1x = native internal size
@@ -253,7 +279,7 @@ async function render(time: number) {
 
     await Promise.all(jobs);
 
-    // Shade on main thread using your current shading model
+    // Shade playground view
     shadingModel.shade(
         outputBuffer,
         depthBuffer,
@@ -263,11 +289,22 @@ async function render(time: number) {
         width,
         height
     );
-
     const imageData = new ImageData(outputBuffer, width, height);
     ctx.putImageData(imageData, 0, 0);
+
+    // Shade analytics view (with its own shader)
     if (analyticsCtx) {
-        analyticsCtx.putImageData(imageData, 0, 0);
+        analyticsShadingModel.shade(
+            analyticsOutputBuffer,
+            depthBuffer,
+            normalBuffer,
+            SDFevaluationBuffer,
+            iterationsBuffer,
+            width,
+            height
+        );
+        const analyticsImageData = new ImageData(analyticsOutputBuffer, width, height);
+        analyticsCtx.putImageData(analyticsImageData, 0, 0);
     }
 
     // FPS calculation
