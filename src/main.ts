@@ -103,6 +103,8 @@ function handleAlgorithmChange(selectedAlgo: string) {
     // reset data for new algorithm.
     data.length = 0;
     chart.updateSeries([{ data: [] }]);
+
+    skipNextSample = true;
 }
 
 algoSelect.addEventListener('change', (e) => {
@@ -150,6 +152,8 @@ function handleSceneChange(index: number) {
     // Reset graph data
     data.length = 0
     chart.updateSeries([{data: []}])
+
+    skipNextSample = true;
 }
 
 // Handle scene dropdown changes
@@ -195,6 +199,8 @@ applyCanvasScale();
 // Graph data/options (using ApexCharts)
 // First, we'll just try with SDF calls.
 let data: [number, number][] = [];
+// Flag to avoid weird graph behaviour
+let skipNextSample = false;
 
 var options = {
     series: data,
@@ -221,7 +227,6 @@ var options = {
         axisTicks: { show: false }
     },
     yaxis: {
-        max: 20,
         labels: {
             formatter: (value: number) => value.toFixed(0)
         }
@@ -341,12 +346,16 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
-    data.push([now, averageSDFCalls]);
-    if (data.length > 12000) {
-        data.shift();
+    if (skipNextSample) {
+        skipNextSample = false;
+    } else {
+        data.push([now, averageSDFCalls]);
+        if (data.length > 12000) {
+            data.shift();
+        }
+        chart.updateSeries([{data: data}]);
     }
-    chart.updateSeries([{data: data}]);
-    
+
     // window.setInterval()
 
     // chart.render();
