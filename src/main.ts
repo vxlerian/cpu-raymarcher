@@ -318,6 +318,11 @@ async function render(time: number) {
 }
 
 window.addEventListener("keydown", e => {
+    // Disable keyboard in analytics.
+    const analyticsView = document.getElementById("analytics-view");
+    const isAnalyticsActive = analyticsView?.classList.contains("active-view");
+    if (isAnalyticsActive) return;
+
     const step = 0.1;
     switch (e.key) {
         case "ArrowUp":    onPan(0, step); break;
