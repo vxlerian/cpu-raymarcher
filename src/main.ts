@@ -7,6 +7,8 @@ import { SphereTracer } from './cpu_algorithms/sphereTracer';
 import { FixedStep } from './cpu_algorithms/fixedStep';
 import { SDFHeatmap } from './util/shading_models/SDFHeatmap';
 import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
+import ApexCharts from "apexcharts";
+import { stdout } from 'process';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
@@ -135,13 +137,46 @@ function applyCanvasScale() {
 }
 applyCanvasScale();
 
+
+// Graph data/options (using ApexCharts)
+// First, we'll just try with SDF calls.
+let y_data: number[] = []
+let x_data: number[] = []
+
+var options = {
+    series: y_data,
+    chart: {
+        id: 'realtime',
+        height: 350,
+        type: 'line',
+        animations: {
+            enabled: true,
+            easing: 'linear',
+            dynamicAnimation: {
+                speed: 1000
+            }
+        },
+        toolbar: { show: false },
+        zoom: { enabled: false }
+    },
+    dataLabels: { enabled: false },
+    stroke: { curve: 'smooth' },
+    title: { text: 'Average SDF Calls', align: 'left' },
+    markers: { size: 0 },
+    // xaxis: { categories: x_data },
+    yaxis: { max: 20 },
+    legend: { show: false },
+};
+
+var chart = new ApexCharts(document.querySelector("#chart"), options);
+
 // Main render loop
 async function render(time: number) {
     // Check if analytics is active, enabling auto rotation if so.
     const analyticsView = document.getElementById("analytics-view");
     const isAnalyticsActive = analyticsView?.classList.contains("active-view");
     if (isAnalyticsActive) {
-        const rotationSpeed = 0.01;
+        const rotationSpeed = 0.1;
         scene.camera.rotateCamera(0, rotationSpeed);
     }
     
@@ -232,6 +267,15 @@ async function render(time: number) {
     maxSDFCallsDisplay.textContent = `Max SDF calls: ${maxSDFCalls}`;
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
+
+    console.log(y_data.length)
+    if (y_data.length == 1000) {
+        y_data.pop();
+    }
+    y_data.push(averageSDFCalls);
+    chart.updateSeries([{data: y_data}]);
+
+    chart.render();
 
     requestAnimationFrame(render);
 }
