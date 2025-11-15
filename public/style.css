@@ -269,8 +269,10 @@ select {
 }
 
 /* Empty right-hand side for future analytics content */
-.analytics-right-placeholder {
+.analytics-right {
     flex: 1;
+    width: 400px;
+    align-content: center;
 }
 
 /* Optional: responsive behaviour similar to #app */
