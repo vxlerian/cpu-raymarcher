@@ -12,6 +12,23 @@ export abstract class Primitive {
 
     abstract localSdf(localPos: vec3): number;
 
+    // returns a rough bounding radius in local space
+    // TODO: could make this more accurate as its always a sphere rn
+    abstract getLocalBoundingRadius(): number;
+
+    // extract world position by inverting the transform
+    public getWorldPosition(): vec3 {
+        const localToWorld = mat4.create();
+        mat4.invert(localToWorld, this.transform);
+        
+        // world position is in the translation component of the transform
+        return vec3.fromValues(
+            localToWorld[12],
+            localToWorld[13],
+            localToWorld[14]
+        );
+    }
+
     // converts the coordinate spaces considering camera and object transform
     sdf(pos: vec3): number {
         const localPos = vec3.create();
