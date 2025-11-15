@@ -74,7 +74,8 @@ export class Scene {
     // get the min distance to the scene at a given position
     // uses an acceleration structure if enabled
     public getDistance(position: vec3, sdfEvaluationCounter?: { count: number }): number {
-        const MAX_DIST = 10;
+        // const MAX_DIST = 10; // for some reason this was making octree break
+        const MAX_DIST = 0.5;
         let closestDistance = MAX_DIST;
         
         if (this.accelerationStructure === "Octree" && this.octree) {
