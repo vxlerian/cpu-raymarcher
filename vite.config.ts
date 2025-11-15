@@ -5,4 +5,11 @@ export default defineConfig({
   build: {
     outDir: 'dist',
   },
+  server: {
+    hmr: true,
+    watch: {
+      usePolling: true,
+      interval: 100,
+    },
+  }
 })
