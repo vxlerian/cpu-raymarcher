@@ -54,19 +54,43 @@ document.getElementById('shading-models')!.addEventListener('change', e => {
 
 // Getting algorithm
 let algorithm = 'sphere-tracer';
-document.getElementById('algorithm')!.addEventListener('change', e => {
-    const selectedAlgo = (e.target as HTMLSelectElement).value;
+const algoSelect = document.getElementById('algorithm') as HTMLSelectElement;
+const analyticsAlgoSelect = document.getElementById('analytics-algorithm') as HTMLSelectElement | null;
+
+function handleAlgorithmChange(selectedAlgo: string) {
     switch (selectedAlgo) {
-    case 'sphere-tracer':
-        algorithm = 'sphere-tracer';
-        break;
-    case 'fixed-step':
-        algorithm = 'fixed-step';
-        break;
-    default:
-        algorithm = 'sphere-tracer';
+        case 'fixed-step':
+            algorithm = 'fixed-step';
+            break;
+        case 'sphere-tracing':
+        default:
+            // HTML uses "sphere-tracing", worker expects "sphere-tracer"
+            algorithm = 'sphere-tracer';
+            break;
     }
+
+    // keep both dropdowns in sync
+    algoSelect.value = selectedAlgo;
+    if (analyticsAlgoSelect) {
+        analyticsAlgoSelect.value = selectedAlgo;
+    }
+
+    // reset data for new algorithm.
+    data.length = 0;
+    chart.updateSeries([{ data: [] }]);
+}
+
+algoSelect.addEventListener('change', (e) => {
+    const value = (e.target as HTMLSelectElement).value;
+    handleAlgorithmChange(value);
 });
+
+if (analyticsAlgoSelect) {
+    analyticsAlgoSelect.addEventListener('change', (e) => {
+        const value = (e.target as HTMLSelectElement).value;
+        handleAlgorithmChange(value);
+    });
+}
 
 // Timing for FPS
 let lastFrame = performance.now();
@@ -293,26 +317,23 @@ async function render(time: number) {
     requestAnimationFrame(render);
 }
 
-// thanks chatgpt
 window.addEventListener("keydown", e => {
     const step = 0.1;
-    if (!analyticsSceneSelect) {
-        switch (e.key) {
-            case "ArrowUp":    onPan(0, step); break;
-            case "ArrowDown":  onPan(0, -step); break;
-            case "ArrowLeft":  onPan(step, 0); break;
-            case "ArrowRight": onPan(-step, 0); break;
-            case "-":
-            case "_":
-                displayScale = Math.max(0.25, displayScale - 0.25);
-                applyCanvasScale();
-                break;
-            case "+":
-            case "=":
-                displayScale = Math.min(8, displayScale + 0.25);
-                applyCanvasScale();
-                break;
-        }
+    switch (e.key) {
+        case "ArrowUp":    onPan(0, step); break;
+        case "ArrowDown":  onPan(0, -step); break;
+        case "ArrowLeft":  onPan(step, 0); break;
+        case "ArrowRight": onPan(-step, 0); break;
+        case "-":
+        case "_":
+            displayScale = Math.max(0.25, displayScale - 0.25);
+            applyCanvasScale();
+            break;
+        case "+":
+        case "=":
+            displayScale = Math.min(8, displayScale + 0.25);
+            applyCanvasScale();
+            break;
     }
 });
 function onPan(dx: number, dy: number) {
