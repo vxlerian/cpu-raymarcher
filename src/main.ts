@@ -97,6 +97,10 @@ function handleSceneChange(index: number) {
     if (analyticsSceneSelect) {
         analyticsSceneSelect.value = String(index);
     }
+    
+    // Reset graph data
+    data.length = 0
+    chart.updateSeries([{data: []}])
 }
 
 // Handle scene dropdown changes
@@ -140,7 +144,7 @@ applyCanvasScale();
 
 // Graph data/options (using ApexCharts)
 // First, we'll just try with SDF calls.
-let data: [number, number][] = []
+let data: [number, number][] = [];
 
 var options = {
     series: data,
@@ -162,12 +166,21 @@ var options = {
     stroke: { curve: 'smooth' },
     title: { text: 'Average SDF Calls', align: 'left' },
     markers: { size: 0 },
-    xaxis: { range: 1000 },
-    yaxis: { max: 20 },
+    xaxis: { 
+        labels: { show: false }, 
+        axisTicks: { show: false }
+    },
+    yaxis: {
+        max: 20,
+        labels: {
+            formatter: (value: number) => value.toFixed(0)
+        }
+    },
     legend: { show: false },
 };
 
 var chart = new ApexCharts(document.querySelector("#chart"), options);
+chart.render();
 
 // Main render loop
 async function render(time: number) {
@@ -268,14 +281,14 @@ async function render(time: number) {
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
     data.push([now, averageSDFCalls]);
-    if (data.length > 100) {
+    if (data.length > 12000) {
         data.shift();
     }
     chart.updateSeries([{data: data}]);
     
     // window.setInterval()
 
-    chart.render();
+    // chart.render();
 
     requestAnimationFrame(render);
 }
@@ -283,21 +296,23 @@ async function render(time: number) {
 // thanks chatgpt
 window.addEventListener("keydown", e => {
     const step = 0.1;
-    switch (e.key) {
-        case "ArrowUp":    onPan(0, step); break;
-        case "ArrowDown":  onPan(0, -step); break;
-        case "ArrowLeft":  onPan(step, 0); break;
-        case "ArrowRight": onPan(-step, 0); break;
-        case "-":
-        case "_":
-            displayScale = Math.max(0.25, displayScale - 0.25);
-            applyCanvasScale();
-            break;
-        case "+":
-        case "=":
-            displayScale = Math.min(8, displayScale + 0.25);
-            applyCanvasScale();
-            break;
+    if (!analyticsSceneSelect) {
+        switch (e.key) {
+            case "ArrowUp":    onPan(0, step); break;
+            case "ArrowDown":  onPan(0, -step); break;
+            case "ArrowLeft":  onPan(step, 0); break;
+            case "ArrowRight": onPan(-step, 0); break;
+            case "-":
+            case "_":
+                displayScale = Math.max(0.25, displayScale - 0.25);
+                applyCanvasScale();
+                break;
+            case "+":
+            case "=":
+                displayScale = Math.min(8, displayScale + 0.25);
+                applyCanvasScale();
+                break;
+        }
     }
 });
 function onPan(dx: number, dy: number) {
