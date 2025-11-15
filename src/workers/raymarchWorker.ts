@@ -2,6 +2,8 @@
 import { Scene } from '../util/scene';
 import { SphereTracer } from '../cpu_algorithms/sphereTracer';
 import { FixedStep } from '../cpu_algorithms/fixedStep';
+import { SphereTracerBVH } from '../cpu_algorithms/sphereTracerBVH';
+import { FixedStepBVH } from '../cpu_algorithms/fixedStepBVH';
 
 // Types exchanged with the main thread
 type Job = {
@@ -13,6 +15,7 @@ type Job = {
   camera: { pitch: number; yaw: number };
   algorithm: string;
   scenePresetIndex: number;
+  optimization: string;
 };
 
 type Result = {
@@ -25,7 +28,7 @@ type Result = {
 };
 
 self.onmessage = (e: MessageEvent<Job>) => {
-  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex } = e.data;
+  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex, optimization } = e.data;
 
   // Build a fresh scene and set camera orientation
   const scene = new Scene();
@@ -39,17 +42,30 @@ self.onmessage = (e: MessageEvent<Job>) => {
   const sdfEval = new Uint16Array(width * tileHeight);
   const iters = new Uint16Array(width * tileHeight);
 
-  // Run the algorithm for this tile
+  // Select raymarcher based on algorithm and optimization
   let alg;
-  switch (algorithm) {
-    case 'sphere-tracer':
+  const algorithmKey = `${algorithm}-${optimization}`;
+  
+  switch (algorithmKey) {
+    case 'sphere-tracer-bvh':
+      alg = new SphereTracerBVH();
+      break;
+    case 'fixed-step-bvh':
+      alg = new FixedStepBVH();
+      break;
+    case 'sphere-tracer-none':
       alg = new SphereTracer();
       break;
-    case 'fixed-step':
+    case 'fixed-step-none':
       alg = new FixedStep();
       break;
     default:
-      alg = new SphereTracer();
+      // Default to non-optimized version if not recognized
+      if (algorithm === 'fixed-step') {
+        alg = new FixedStep();
+      } else {
+        alg = new SphereTracer();
+      }
   }
 
   alg.runRaymarcher(

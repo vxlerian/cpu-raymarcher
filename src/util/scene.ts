@@ -6,6 +6,7 @@ import { Primitive } from "./primitives/primitive";
 import { Sphere } from "./primitives/sphere";
 import { Camera } from "./camera";
 import { SceneManager } from "./sceneManager";
+import { BVH } from "./bvh";
 
 export class Scene {
     // a scene is a list of objects and one camera
@@ -13,11 +14,13 @@ export class Scene {
     // private camera: Camera
     public objectSDFs: Array<Primitive>
     public camera: Camera;
+    public bvh: BVH;
     private currentPresetIndex: number = 0;
 
     constructor() {
         this.camera = new Camera;
         this.objectSDFs = new Array;
+        this.bvh = new BVH();
         this.loadPreset(0); // load default scene
     }
 
@@ -27,6 +30,9 @@ export class Scene {
 
         // Clear existing objects and load new ones
         this.objectSDFs = [...preset.objects];
+        
+        // Build BVH for the new scene
+        this.bvh.build(this.objectSDFs);
     }
 
     public nextPreset() {

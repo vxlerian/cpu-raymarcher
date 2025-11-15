@@ -59,6 +59,20 @@ document.getElementById('algorithm')!.addEventListener('change', e => {
     }
 });
 
+// Getting optimization
+let optimization = 'none';
+document.getElementById('space-optimisation')!.addEventListener('change', e => {
+    const selectedOpt = (e.target as HTMLSelectElement).value;
+    switch (selectedOpt) {
+    case 'bvh':
+        optimization = 'bvh';
+        break;
+    case 'none':
+    default:
+        optimization = 'none';
+    }
+});
+
 // Timing for FPS
 let lastFrame = performance.now();
 let frameCount = 0;
@@ -133,7 +147,7 @@ async function render(time: number) {
             };
             w.addEventListener('message', handler);
             const sceneInfo = scene.getCurrentPresetInfo();
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index });
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index, optimization });
         });
     });
 
