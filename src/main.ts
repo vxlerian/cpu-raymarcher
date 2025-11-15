@@ -10,8 +10,8 @@ import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
-const width = canvas.width;
-const height = canvas.height;
+let width = canvas.width;
+let height = canvas.height;
 
 const fpsDisplay = document.getElementById("fps")!;
 
@@ -20,6 +20,7 @@ const maxSDFCallsDisplay = document.getElementById("max-sdf-calls")!;
 const minSDFCallsDisplay = document.getElementById("min-sdf-calls")!;
 
 const averageIterationsDisplay = document.getElementById("average-iterations")!;
+const resolutionDisplay = document.getElementById("resolution-display")!;
 
 let shadingModel: ShadingModel = new NormalModel();
 // Changing model
@@ -95,23 +96,73 @@ const workers = Array.from({ length: NUM_WORKERS }, () =>
 );
 
 // Persistent buffers to avoid re-allocation each frame
-const depthBuffer = new Uint8ClampedArray(width * height);
-const normalBuffer = new Uint8ClampedArray(width * height * 3);
-const SDFevaluationBuffer = new Uint16Array(width * height);
-const iterationsBuffer = new Uint16Array(width * height);
-const outputBuffer = new Uint8ClampedArray(width * height * 4); // RGBA
+// are reset when resolution changes tho
+let depthBuffer = new Uint8ClampedArray(width * height);
+let normalBuffer = new Uint8ClampedArray(width * height * 3);
+let SDFevaluationBuffer = new Uint16Array(width * height);
+let iterationsBuffer = new Uint16Array(width * height);
+let outputBuffer = new Uint8ClampedArray(width * height * 4); // RGBA
 
-// Display scaling: keep internal resolution (width x height), scale via CSS only
-let displayScale = 1.0; // 1x = native internal size
-function applyCanvasScale() {
-    canvas.style.width = `${width * displayScale}px`;
-    canvas.style.height = `${height * displayScale}px`;
+// resolution scaling stuff
+let resolutionPower = 8; // default to 2^8 = 256 x 256
+const TARGET_DISPLAY_SIZE = 512; // Keep canvas display size around 512px
+const MIN_RESOLUTION_POWER = 4; // min res = 2^4 = 16 x 16
+const MAX_RESOLUTION_POWER = 10; // max res = 2^10 = 1024 x 1024
+let isResizing = false;
+let renderInProgress = false;
+
+function updateResolution() {
+    isResizing = true;
+    
+    // wait for current render to complete before updating
+    const attemptUpdate = () => {
+        if (renderInProgress) {
+            setTimeout(attemptUpdate, 5);
+            return;
+        }
+        
+        const newResolution = Math.pow(2, resolutionPower);
+        width = newResolution;
+        height = newResolution;
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // scale display to match target display size
+        const displayScale = TARGET_DISPLAY_SIZE / width;
+        canvas.style.width = `${width * displayScale}px`;
+        canvas.style.height = `${height * displayScale}px`;
+        
+        // update the text thing
+        resolutionDisplay.textContent = `Resolution: ${width}x${height}`;
+        
+        // reallocate buffers with new size
+        const totalPixels = width * height;
+        depthBuffer = new Uint8ClampedArray(totalPixels);
+        normalBuffer = new Uint8ClampedArray(totalPixels * 3);
+        SDFevaluationBuffer = new Uint16Array(totalPixels);
+        iterationsBuffer = new Uint16Array(totalPixels);
+        outputBuffer = new Uint8ClampedArray(totalPixels * 4);
+        
+        // clear the flag immediately so rendering can resume
+        isResizing = false;
+    };
+    
+    attemptUpdate();
 }
 
-applyCanvasScale();
+updateResolution();
 
 // Main render loop
 async function render(time: number) {
+    // skip rendering during resolution changes
+    if (isResizing) {
+        requestAnimationFrame(render);
+        return;
+    }
+    
+    renderInProgress = true;
+    
     // Partition rows across workers
     const rowsPerWorker = Math.ceil(height / NUM_WORKERS);
     const [pitch, yaw] = scene.camera.getAngles();
@@ -197,6 +248,7 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
+    renderInProgress = false;
     requestAnimationFrame(render);
 }
 
@@ -210,13 +262,17 @@ window.addEventListener("keydown", e => {
         case "ArrowRight": onPan(-step, 0); break;
         case "-":
         case "_":
-            displayScale = Math.max(0.25, displayScale - 0.25);
-            applyCanvasScale();
+            if (resolutionPower > MIN_RESOLUTION_POWER) {
+                resolutionPower--;
+                updateResolution();
+            }
             break;
         case "+":
         case "=":
-            displayScale = Math.min(8, displayScale + 0.25);
-            applyCanvasScale();
+            if (resolutionPower < MAX_RESOLUTION_POWER) {
+                resolutionPower++;
+                updateResolution();
+            }
             break;
     }
 });
