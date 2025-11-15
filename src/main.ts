@@ -201,6 +201,8 @@ applyCanvasScale();
 let data: [number, number][] = [];
 // Flag to avoid weird graph behaviour
 let skipNextSample = false;
+let currentYMin = 0;
+let currentYMax = 100; 
 
 var options = {
     series: data,
@@ -227,6 +229,8 @@ var options = {
         axisTicks: { show: false }
     },
     yaxis: {
+        min: currentYMin,
+        max: currentYMax,
         labels: {
             formatter: (value: number) => value.toFixed(0)
         }
@@ -345,6 +349,28 @@ async function render(time: number) {
     maxSDFCallsDisplay.textContent = `Max SDF calls: ${maxSDFCalls}`;
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
+
+    const desiredYMin = Math.max(0, averageSDFCalls - 10); // clamp at 0 if you like
+    const desiredYMax = averageSDFCalls + 10;
+
+    // Avoid degenerate range (min == max)
+    const safeYMax = desiredYMax <= desiredYMin ? desiredYMin + 1 : desiredYMax;
+
+    // Only change the ranges if they actually differ.
+    if (desiredYMin !== currentYMin || safeYMax !== currentYMax) {
+        currentYMin = desiredYMin;
+        currentYMax = safeYMax;
+
+        chart.updateOptions({
+            yaxis: {
+                min: currentYMin,
+                max: currentYMax,
+                labels: {
+                    formatter: (value: number) => value.toFixed(0)
+                }
+            }
+        }, false, false); // no full redraw/animation
+    }
 
     if (skipNextSample) {
         skipNextSample = false;
