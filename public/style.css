@@ -239,6 +239,8 @@ select {
     color: var(--text-color);
     font-size: 0.9rem;
     line-height: 1.4;
+
+    align-items: flex-start;
 }
 
 /* Left column: options + canvas stacked */
@@ -254,6 +256,7 @@ select {
     flex-direction: column;
     gap: 0.5rem;
     font-size: 0.8rem;
+    align-items: center;
 }
 
 /* Canvas under controls */
@@ -270,10 +273,17 @@ select {
 
 /* Empty right-hand side for future analytics content */
 .analytics-right {
+    display: flex;
     flex: 1;
     flex-direction: column;
     width: 400px;
     align-content: center;
+    align-items: stretch;
+}
+
+#analytics-select {
+    align-self: center;
+    margin-top: 0.75rem;
 }
 
 /* Optional: responsive behaviour similar to #app */

@@ -109,6 +109,9 @@
             <div id="analytics-view" class="view">
                <div id="analytics-app">
                   <div class="analytics-left">
+                     <div class="analytics-canvas-container">
+                        <canvas id="analytics-canvas" width="256" height="256"></canvas>
+                     </div>
                      <div class="analytics-controls">
                         <div>
                            <label for="analytics-algorithm">Select algorithm: </label>
@@ -134,19 +137,21 @@
                         </div>
                      </div>
    
-                     <div class="analytics-canvas-container">
-                        <canvas id="analytics-canvas" width="256" height="256"></canvas>
-                     </div>
+
                   </div>
    
                   <div class="analytics-right">
                      <div id="chart"></div>
-                     <select id="analytics-select">
-                        <option value="avg-sdf" selected>Average SDF Calls</option>
-                        <option value="max-sdf">Max SDF Calls</option>
-                        <option value="frame-length">Frame Length</option>
-                        <option value="avg-iters">Average Iterations</option>
-                     </select>
+                     
+                     <div id="analytics-select">
+                        Select metric: &nbsp;
+                        <select id="analytics-menu">
+                           <option value="avg-sdf" >Average SDF Calls</option>
+                           <option value="max-sdf">Max SDF Calls</option>
+                           <option value="frame-length">Frame Length</option>
+                           <option value="avg-iters">Average Iterations</option>
+                        </select>
+                     </div>
                   </div>
                </div>
             </div>

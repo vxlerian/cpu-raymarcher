@@ -76,7 +76,7 @@ const metricTitles: Record<AnalyticMetric, string> = {
 }
 
 // Check for selected metric
-const metricSelect = document.getElementById('analytics-select') as HTMLSelectElement | null;
+const metricSelect = document.getElementById('analytics-menu') as HTMLSelectElement | null;
 if (metricSelect) {
     metricSelect.addEventListener('change', (e) => {
         const value = (e.target as HTMLSelectElement).value as AnalyticMetric;
