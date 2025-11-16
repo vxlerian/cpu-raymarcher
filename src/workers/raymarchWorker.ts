@@ -13,6 +13,7 @@ type Job = {
   camera: { pitch: number; yaw: number };
   algorithm: string;
   scenePresetIndex: number;
+  accelerationStructure: string;
 };
 
 type Result = {
@@ -25,10 +26,10 @@ type Result = {
 };
 
 self.onmessage = (e: MessageEvent<Job>) => {
-  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex } = e.data;
+  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex, accelerationStructure } = e.data;
 
   // Build a fresh scene and set camera orientation
-  const scene = new Scene();
+  const scene = new Scene(accelerationStructure);
   scene.loadPreset(scenePresetIndex); // Load the current scene
   scene.camera.setAngles(camera.pitch, camera.yaw);
 

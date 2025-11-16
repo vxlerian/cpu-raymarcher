@@ -12,4 +12,8 @@ export class Sphere extends Primitive {
     localSdf(localPos: vec3): number {
         return vec3.length(localPos) - this.radius;
     }
+
+    getLocalBoundingRadius(): number {
+        return this.radius;
+    }
 }

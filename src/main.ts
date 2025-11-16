@@ -59,6 +59,16 @@ document.getElementById('algorithm')!.addEventListener('change', e => {
     }
 });
 
+// getting acceleration structure type
+let accelerationStructure = "None";
+document.getElementById('octree-toggle')!.addEventListener('change', e => {
+    if ((e.target as HTMLInputElement).checked) {
+        accelerationStructure = "Octree";
+    } else {
+        accelerationStructure = "None";
+    }
+});
+
 // Timing for FPS
 let lastFrame = performance.now();
 let frameCount = 0;
@@ -133,7 +143,7 @@ async function render(time: number) {
             };
             w.addEventListener('message', handler);
             const sceneInfo = scene.getCurrentPresetInfo();
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index });
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index, accelerationStructure });
         });
     });
 

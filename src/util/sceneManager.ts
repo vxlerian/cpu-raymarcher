@@ -99,6 +99,29 @@ export class SceneManager {
             objects: [
                 SceneManager.createTorus(0, 0, 0, 1.3)
             ]
+        },
+        {
+            name: "Dense Sphere Grid",
+            objects: (() => {
+                const spheres = [];
+                const gridSize = 5;
+                const spacing = 0.6;
+                const offset = (gridSize - 1) * spacing / 2;
+                
+                for (let x = 0; x < gridSize; x++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let z = 0; z < gridSize; z++) {
+                            spheres.push(SceneManager.createSphere(
+                                x * spacing - offset,
+                                y * spacing - offset,
+                                z * spacing - offset,
+                                0.15
+                            ));
+                        }
+                    }
+                }
+                return spheres;
+            })()
         }
     ];
 
