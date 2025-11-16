@@ -370,15 +370,32 @@ async function render(time: number) {
         if (maxData === -1 || averageSDFCalls > maxData) {
             maxData = averageSDFCalls;
         }
-
+                
         const desiredYMin = Math.max(0, minData * (1 / AXIS_SCALE_FACTOR));
         const desiredYMax = maxData * AXIS_SCALE_FACTOR;
+
+        // snap to "nice" integer bounds based on desired range
+        const padding = (desiredYMax - desiredYMin) * 0.05 || 1;
+
+        let yMin = Math.floor(desiredYMin - padding);
+        let yMax = Math.ceil(desiredYMax + padding);
+
+        if (yMax <= yMin) {
+            yMax = yMin + 1;
+        }
+
+        // number of *segments* between ticks
+        const span = yMax - yMin;
+        // tickAmount is number of ticks, so span + 1
+        const tickAmount = span + 1;
 
         if (minData !== prevMin || maxData !== prevMax) {
             chart.updateOptions({
                 yaxis: {
-                    min: desiredYMin,
-                    max: desiredYMax,
+                    min: yMin,
+                    max: yMax,
+                    tickAmount,          
+                    forceNiceScale: false,
                     labels: {
                         formatter: (value: number) => value.toFixed(0)
                     }
