@@ -464,7 +464,7 @@ async function render(time: number) {
         data.push([now, chosenAnalytic]);
         while (data.length && data[0][0] < cutoff) data.shift();
 
-        chart.updateSeries([{ data }]);
+        chart.updateSeries([{ data }], false);
 
         console.log({
             selectedMetric,
