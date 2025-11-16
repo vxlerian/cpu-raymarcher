@@ -9,6 +9,7 @@ import { SDFHeatmap } from './util/shading_models/SDFHeatmap';
 import { IterationHeatmap } from './util/shading_models/IterationHeatmap';
 import ApexCharts from "apexcharts";
 import { stdout } from 'process';
+import { select } from 'three/tsl';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
@@ -27,7 +28,6 @@ const fpsDisplay = document.getElementById("fps")!;
 const averageSDFCallsDisplay = document.getElementById("average-sdf-calls")!;
 const maxSDFCallsDisplay = document.getElementById("max-sdf-calls")!;
 const minSDFCallsDisplay = document.getElementById("min-sdf-calls")!;
-
 const averageIterationsDisplay = document.getElementById("average-iterations")!;
 
 function createShadingModelFromValue(selectedModel: string): ShadingModel {
@@ -65,6 +65,33 @@ if (analyticsShadingSelect) {
 let algorithm = 'sphere-tracer';
 const algoSelect = document.getElementById('algorithm') as HTMLSelectElement;
 const analyticsAlgoSelect = document.getElementById('analytics-algorithm') as HTMLSelectElement | null;
+
+type AnalyticMetric = 'frame-length' | 'avg-sdf' | 'max-sdf' | 'avg-iters';
+let selectedMetric: AnalyticMetric = 'avg-sdf';
+const metricTitles: Record<AnalyticMetric, string> = {
+    'frame-length' : 'Frame Length (ms)',
+    'avg-sdf' : 'Average SDF Calls',
+    'max-sdf' : 'Max SDF Calls',
+    'avg-iters' : 'Average Iterations',
+}
+
+// Check for selected metric
+const metricSelect = document.getElementById('analytics-select') as HTMLSelectElement | null;
+if (metricSelect) {
+    metricSelect.addEventListener('change', (e) => {
+        const value = (e.target as HTMLSelectElement).value as AnalyticMetric;
+        selectedMetric = value;
+        
+        // Reset the graph
+        resetGraph();
+        chart.updateOptions({
+            title: {
+                text: metricTitles[selectedMetric],
+                align: 'left'
+            }
+        }, false, false);
+    });
+}
 
 // Graph data/options (using ApexCharts)
 let data: [number, number][] = [];
@@ -202,7 +229,10 @@ var options = {
     },
     dataLabels: { enabled: false },
     stroke: { curve: 'smooth' },
-    title: { text: 'Average SDF Calls', align: 'left' },
+    title: {
+        text: metricTitles[selectedMetric],
+        align: 'left'
+    },
     markers: { size: 0 },
     xaxis: { 
         type: 'datetime',
@@ -300,14 +330,9 @@ async function render(time: number) {
 
     // FPS calculation
     const now = performance.now();
-    // frameCount++;
-    // if (now - lastFrame >= 1000) {
-    //     fpsDisplay.textContent = `FPS: ${frameCount}`;
-    //     frameCount = 0;
-    //     lastFrame = now;
-    // }
-    let frameLength = now - lastFrame;
-    fpsDisplay.textContent = `Frame length: ${(now - lastFrame).toPrecision(4)}`;
+    const frameLength = now - lastFrame;
+
+    fpsDisplay.textContent = `Frame length: ${frameLength.toPrecision(4)}`;
     lastFrame = now;
 
     // Update SDF calls and iterations diagnostics
@@ -333,7 +358,24 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
-    let chosenAnalytic = averageIterations;
+    // Use the selected metric.
+    let chosenAnalytic: number;
+    switch (selectedMetric) {
+        case 'frame-length':
+            chosenAnalytic = frameLength;
+            break;
+        case 'avg-iters':
+            chosenAnalytic = averageIterations;
+            break;
+        case 'max-sdf':
+            chosenAnalytic = maxSDFCalls;
+            break;
+        case 'avg-sdf':
+        default:
+            chosenAnalytic = averageSDFCalls;
+            break;
+    }
+
     if (skipNextSample) {
         skipNextSample = false;
     } else {

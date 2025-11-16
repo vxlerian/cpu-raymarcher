@@ -271,6 +271,7 @@ select {
 /* Empty right-hand side for future analytics content */
 .analytics-right {
     flex: 1;
+    flex-direction: column;
     width: 400px;
     align-content: center;
 }
