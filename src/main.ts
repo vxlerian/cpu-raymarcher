@@ -12,7 +12,7 @@ import { stdout } from 'process';
 
 const canvas = document.getElementById("shader-canvas") as HTMLCanvasElement;
 const ctx = canvas.getContext("2d")!;
-const analyticsCanvas = document.getElementById("analytics-canvas") as HTMLCanvasElement
+const analyticsCanvas = document.getElementById("analytics-canvas") as HTMLCanvasElement;
 const analyticsCtx = analyticsCanvas ? analyticsCanvas.getContext("2d")! : null;
 const width = canvas.width;
 const height = canvas.height;
@@ -30,59 +30,62 @@ const minSDFCallsDisplay = document.getElementById("min-sdf-calls")!;
 
 const averageIterationsDisplay = document.getElementById("average-iterations")!;
 
-let shadingModel: ShadingModel = new NormalModel();
-let analyticsShadingModel: ShadingModel = new NormalModel(); // analytics shader (default)
-// Changing model
-document.getElementById('shading-models')!.addEventListener('change', e => {
-    const selectedModel = (e.target as HTMLSelectElement).value;
+function createShadingModelFromValue(selectedModel: string): ShadingModel {
     switch (selectedModel) {
         case 'phong':
-            shadingModel = new PhongModel();
-            break;
-        case 'normal':
-            shadingModel = new NormalModel();
-            break;
+            return new PhongModel();
         case 'sdf-heatmap':
-            shadingModel = new SDFHeatmap();
-            break;
+            return new SDFHeatmap();
         case 'iteration-heatmap':
-            shadingModel = new IterationHeatmap();
-            break;
+            return new IterationHeatmap();
+        case 'normal':
         default:
-            shadingModel = new NormalModel();
+            return new NormalModel();
     }
-});
+}
 
+let shadingModel: ShadingModel = new NormalModel();
+let analyticsShadingModel: ShadingModel = new NormalModel(); // analytics shader (default)
+
+const shadingSelect = document.getElementById('shading-models') as HTMLSelectElement;
 const analyticsShadingSelect = document.getElementById('analytics-shading-model') as HTMLSelectElement | null;
+
+shadingSelect.addEventListener('change', e => {
+    const selectedModel = (e.target as HTMLSelectElement).value;
+    shadingModel = createShadingModelFromValue(selectedModel);
+});
 
 if (analyticsShadingSelect) {
     analyticsShadingSelect.addEventListener('change', e => {
         const selectedModel = (e.target as HTMLSelectElement).value;
-        switch (selectedModel) {
-            case 'phong':
-                analyticsShadingModel = new PhongModel();
-                break;
-            case 'normal':
-                analyticsShadingModel = new NormalModel();
-                break;
-            case 'sdf-heatmap':
-                analyticsShadingModel = new SDFHeatmap();
-                break;
-            case 'iteration-heatmap':
-                analyticsShadingModel = new IterationHeatmap();
-                break;
-            default:
-                analyticsShadingModel = new NormalModel();
-        }
+        analyticsShadingModel = createShadingModelFromValue(selectedModel);
     });
 }
 
-// Getting algorithm
 let algorithm = 'sphere-tracer';
 const algoSelect = document.getElementById('algorithm') as HTMLSelectElement;
 const analyticsAlgoSelect = document.getElementById('analytics-algorithm') as HTMLSelectElement | null;
 
+// Graph data/options (using ApexCharts)
+let data: [number, number][] = [];
+let minData: number = -1;
+let maxData: number = -1;
+// Flag to avoid weird graph behaviour
+let skipNextSample = false;
+const AXIS_SCALE_FACTOR = 1.05;
+const DEFAULT_Y_MIN = 0;
+const DEFAULT_Y_MAX = 100;
+
+function resetGraph() {
+    data.length = 0;
+    chart.updateSeries([{ data }]);
+    minData = -1;
+    maxData = -1;
+    skipNextSample = true;
+}
+
 function handleAlgorithmChange(selectedAlgo: string) {
+    // internal algorithm string for the worker
     switch (selectedAlgo) {
         case 'fixed-step':
             algorithm = 'fixed-step';
@@ -100,12 +103,8 @@ function handleAlgorithmChange(selectedAlgo: string) {
         analyticsAlgoSelect.value = selectedAlgo;
     }
 
-    // reset data for new algorithm.
-    data.length = 0;
-    chart.updateSeries([{ data: [] }]);
-    minData = -1;
-    maxData = -1;
-    skipNextSample = true;
+    // reset graph data for new algorithm
+    resetGraph();
 }
 
 algoSelect.addEventListener('change', (e) => {
@@ -122,21 +121,13 @@ if (analyticsAlgoSelect) {
 
 // Timing for FPS
 let lastFrame = performance.now();
-let frameCount = 0;
+// let frameCount = 0; // not used right now
 
 const scene = new Scene();
-
-// Scene dropdown setup
 const sceneSelect = document.getElementById('scene-select') as HTMLSelectElement;
 const analyticsSceneSelect = document.getElementById('analytics-scene-select') as HTMLSelectElement | null;
 
-// Handle scene dropdown changes
-sceneSelect.addEventListener('change', (e) => {
-    const selectedIndex = parseInt((e.target as HTMLSelectElement).value);
-    scene.loadPreset(selectedIndex);
-});
-
-// Initialise dropdown with current scene
+// Initialise dropdowns with current scene
 const sceneInfo = scene.getCurrentPresetInfo();
 SceneManager.populateSceneDropdown(sceneSelect, sceneInfo.index);
 if (analyticsSceneSelect) {
@@ -149,16 +140,11 @@ function handleSceneChange(index: number) {
     if (analyticsSceneSelect) {
         analyticsSceneSelect.value = String(index);
     }
-    
-    // Reset graph data
-    data.length = 0
-    chart.updateSeries([{data: []}])
-    minData = -1;
-    maxData = -1;
-    skipNextSample = true;
+    // Reset graph data when the scene changes
+    resetGraph();
 }
 
-// Handle scene dropdown changes
+// Handle scene dropdown changes (single source of truth)
 sceneSelect.addEventListener('change', (e) => {
     const selectedIndex = parseInt((e.target as HTMLSelectElement).value);
     handleSceneChange(selectedIndex);
@@ -197,18 +183,7 @@ function applyCanvasScale() {
 }
 applyCanvasScale();
 
-
-// Graph data/options (using ApexCharts)
-// First, we'll just try with SDF calls.
-let data: [number, number][] = [];
-let minData: number = -1;
-let maxData: number = -1;
-// Flag to avoid weird graph behaviour
-let skipNextSample = false; 
-const AXIS_SCALE_FACTOR = 1.05;
-const DEFAULT_Y_MIN = 0;
-const DEFAULT_Y_MAX = 100;
-
+// ApexCharts options
 var options = {
     series: data,
     chart: {
@@ -386,15 +361,16 @@ async function render(time: number) {
 
         // number of *segments* between ticks
         const span = yMax - yMin;
-        // tickAmount is number of ticks, so span + 1
-        const tickAmount = span + 1;
+        // ensures that we have the same number of ticks as there are integers
+        // between max and min
+        const tickAmount = span;
 
         if (minData !== prevMin || maxData !== prevMax) {
             chart.updateOptions({
                 yaxis: {
                     min: yMin,
                     max: yMax,
-                    tickAmount,          
+                    tickAmount,
                     forceNiceScale: false,
                     labels: {
                         formatter: (value: number) => value.toFixed(0)
@@ -409,10 +385,6 @@ async function render(time: number) {
 
         chart.updateSeries([{ data }]);
     }
-
-    // window.setInterval()
-
-    // chart.render();
 
     requestAnimationFrame(render);
 }
@@ -441,6 +413,7 @@ window.addEventListener("keydown", e => {
             break;
     }
 });
+
 function onPan(dx: number, dy: number) {
     scene.camera.rotateCamera(-dy, dx);
 }
