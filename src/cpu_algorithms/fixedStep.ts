@@ -76,12 +76,10 @@ export class FixedStep extends Raymarcher {
         idx: number,
         SDFevaluationBuffer: Uint16Array
     ): number {
-        SDFevaluationBuffer[idx] += 1;
-        let closestDistance = MAX_DIST;
-        for (const primitive of scene.objectSDFs) {
-            closestDistance = Math.min(primitive.sdf(position), closestDistance);
-        }
-        return closestDistance;
+        const counter = { count: 0 };
+        const distance = scene.getDistance(position, counter);
+        SDFevaluationBuffer[idx] += counter.count;
+        return distance;
     }
 
     private getNormal(scene: Scene, position: vec3, idx: number, SDFevaluationBuffer: Uint16Array): vec3 {

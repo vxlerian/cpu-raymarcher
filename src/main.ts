@@ -146,6 +146,16 @@ if (analyticsAlgoSelect) {
     });
 }
 
+// getting acceleration structure type
+let accelerationStructure = "None";
+document.getElementById('octree-toggle')!.addEventListener('change', e => {
+    if ((e.target as HTMLInputElement).checked) {
+        accelerationStructure = "Octree";
+    } else {
+        accelerationStructure = "None";
+    }
+});
+
 // Timing for FPS
 let lastFrame = performance.now();
 // let frameCount = 0; // not used right now
@@ -304,7 +314,7 @@ async function render(time: number) {
             };
             w.addEventListener('message', handler);
             const sceneInfo = scene.getCurrentPresetInfo();
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index });
+            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index, accelerationStructure });
         });
     });
 
@@ -471,5 +481,57 @@ window.addEventListener("keydown", e => {
 function onPan(dx: number, dy: number) {
     scene.camera.rotateCamera(-dy, dx);
 }
+
+// Mobile DPAD camera control
+const mobileStep = 0.1;
+let mobilePressed = {
+    "up": false,
+    "down": false,
+    "right": false,
+    "left": false
+}
+
+// Up
+const up = document.getElementById('up');
+// up?.addEventListener('click', () => onPan(0, mobileStep));
+up?.addEventListener('pointerdown', () => {
+    mobilePressed["up"] = true;
+    setInterval(() => {mobilePressed["up"] ? onPan(0, mobileStep) : null}, 100);
+});
+up?.addEventListener('pointerout', () => {
+    mobilePressed["up"] = false;
+});
+
+// Down
+const down = document.getElementById('down');
+// down?.addEventListener('click', () => onPan(0, -mobileStep));
+down?.addEventListener('pointerdown', () => {
+    mobilePressed["down"] = true;
+    setInterval(() => {mobilePressed["down"] ? onPan(0, -mobileStep) : null}, 100);
+});
+down?.addEventListener('pointerout', () => {
+    mobilePressed["down"] = false;
+});
+
+// Left
+const left = document.getElementById('left');
+left?.addEventListener('pointerdown', () => {
+    mobilePressed["left"] = true;
+    setInterval(() => {mobilePressed["left"] ? onPan(mobileStep, 0) : null}, 100);
+});
+left?.addEventListener('pointerout', () => {
+    mobilePressed["left"] = false;
+});
+
+// Right
+const right = document.getElementById('right');
+right?.addEventListener('pointerdown', () => {
+    mobilePressed["right"] = true;
+    setInterval(() => {mobilePressed["right"] ? onPan(-mobileStep, 0) : null}, 100);
+});
+right?.addEventListener('pointerout', () => {
+    mobilePressed["right"] = false;
+});
+
 
 requestAnimationFrame(render);

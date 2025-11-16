@@ -23,4 +23,8 @@ export class Torus extends Primitive {
         // Distance to the torus surface
         return Math.sqrt(qx * qx + qy * qy) - this.minorRadius;
     }
+
+    getLocalBoundingRadius(): number {
+        return this.majorRadius + this.minorRadius;
+    }
 }

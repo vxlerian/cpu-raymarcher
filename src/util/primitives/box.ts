@@ -28,4 +28,8 @@ export class Box extends Primitive {
 
         return outsideDist + insideDist;
     }
+
+    getLocalBoundingRadius(): number {
+        return vec3.length(this.halfSize);
+    }
 }
