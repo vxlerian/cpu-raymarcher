@@ -103,6 +103,11 @@ const AXIS_SCALE_FACTOR = 1.01;
 const DEFAULT_Y_MIN = 0;
 const DEFAULT_Y_MAX = 100;
 
+// Literally just so theming works 
+let currentYMin = DEFAULT_Y_MIN;
+let currentYMax = DEFAULT_Y_MAX;
+let currentTickAmount = Math.min(DEFAULT_Y_MAX - DEFAULT_Y_MIN, 20);
+
 function resetGraph() {
     data.length = 0;
     chart.updateSeries([{ data }]);
@@ -290,6 +295,42 @@ var options = {
 var chart = new ApexCharts(document.querySelector("#chart"), options);
 chart.render();
 
+// helper (need to run it once first at start)
+function applyChartTheme(isDark: boolean) {
+    const color = isDark ? "#eaeaea" : "#1a1a1f";
+
+    chart.updateOptions({
+        chart: { foreColor: color },
+        title: {
+            style: { color }
+        },
+        xaxis: {
+            title: {
+                style: { color }
+            }
+        },
+        yaxis: {
+            min: currentYMin,
+            max: currentYMax,
+            tickAmount: currentTickAmount,
+            forceNiceScale: false,
+            labels: {
+                formatter: (value: number) => value.toFixed(0),
+            }
+        }
+    }, false, false);
+}
+
+// initial theme based on body class
+const initialIsDark = document.body.classList.contains('dark-mode');
+applyChartTheme(initialIsDark);
+
+// then listen for future theme changes
+window.addEventListener('theme-change', (e: Event) => {
+    const isDark = (e as CustomEvent<boolean>).detail;  
+    applyChartTheme(isDark);
+});
+
 // Main render loop
 async function render(time: number) {
     // Check if analytics is active, enabling auto rotation if so.
@@ -447,6 +488,10 @@ async function render(time: number) {
         const tickAmount = Math.min(span, 20);
 
         if (minData !== prevMin || maxData !== prevMax) {
+            currentYMin = yMin;
+            currentYMax = yMax;
+            currentTickAmount = tickAmount;
+            
             chart.updateOptions({
                 yaxis: {
                     min: yMin,

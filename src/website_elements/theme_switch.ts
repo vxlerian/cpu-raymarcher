@@ -5,11 +5,21 @@
 const enabledarkMode = () => {
     document.body.classList.add('dark-mode')
     sessionStorage.setItem('dark-mode', 'active')
+    
+    const isDark = true;
+    window.dispatchEvent(
+        new CustomEvent('theme-change', { detail: isDark })
+    )
 }
 
 const disabledarkMode = () => {
     document.body.classList.remove('dark-mode')
     sessionStorage.setItem('dark-mode', 'inactive')
+
+    const isDark = false;
+    window.dispatchEvent(
+        new CustomEvent('theme-change', { detail: isDark })
+    )
 }
 
 const mainFunc = () => {
