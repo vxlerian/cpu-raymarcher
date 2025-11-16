@@ -146,14 +146,30 @@ if (analyticsAlgoSelect) {
     });
 }
 
-// getting acceleration structure type
-let accelerationStructure = "None";
-document.getElementById('octree-toggle')!.addEventListener('change', e => {
-    if ((e.target as HTMLInputElement).checked) {
-        accelerationStructure = "Octree";
-    } else {
-        accelerationStructure = "None";
-    }
+// getting acceleration structure type (added analytics support)
+let accelerationStructure: "None" | "Octree" = "None";
+const octreeToggle = document.getElementById('octree-toggle') as HTMLInputElement | null;
+const analyticsOctreeToggle = document.getElementById('analytics-octree-toggle') as HTMLInputElement | null;
+
+function handleAccelerationToggle(checked: boolean) {
+    accelerationStructure = checked ? "Octree" : "None";
+
+    // keep both checkboxes in sync
+    if (octreeToggle) octreeToggle.checked = checked;
+    if (analyticsOctreeToggle) analyticsOctreeToggle.checked = checked;
+
+    // acceleration changes performance → reset graph
+    resetGraph();
+}
+
+// Playground checkbox
+octreeToggle?.addEventListener('change', e => {
+    handleAccelerationToggle((e.target as HTMLInputElement).checked);
+});
+
+// Analytics checkbox
+analyticsOctreeToggle?.addEventListener('change', e => {
+    handleAccelerationToggle((e.target as HTMLInputElement).checked);
 });
 
 // Timing for FPS

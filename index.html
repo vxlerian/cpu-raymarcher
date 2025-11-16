@@ -73,7 +73,6 @@
                         <div>
                             <label for="algorithm">Select algorithm: </label>
                             <select name="selectedAlgo" id="algorithm">
-                                <!-- Use value that your main.ts expects; this keeps the old string -->
                                 <option value="sphere-tracing">Sphere Tracing</option>
                                 <option value="fixed-step">Fixed Step</option>
                             </select>
@@ -152,6 +151,14 @@
                                     <option value="fixed-step">Fixed Step</option>
                                 </select>
                             </div>
+
+                           <div>
+                           <label>
+                              <input type="checkbox" id="analytics-octree-toggle">
+                              Use octree acceleration
+                           </label>
+                           </div>
+
                             <div>
                                 <label for="analytics-scene-select">Select scene: </label>
                                 <select name="selectedScene" id="analytics-scene-select">
