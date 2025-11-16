@@ -333,10 +333,7 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
-    
-
     let chosenAnalytic = averageIterations;
-
     if (skipNextSample) {
         skipNextSample = false;
     } else {
