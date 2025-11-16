@@ -7,8 +7,8 @@
     --label-color: #5a5e6e;
     --shader-background: #ffffff;
     --shader-border: #c6c8d6;
-    --box-shadow: rgba(0, 0, 0, 0.08); 
-    --diagnostics-color: #3a3d4a;   
+    --box-shadow: rgba(0, 0, 0, 0.08);
+    --diagnostics-color: #3a3d4a;
 }
 
 .dark-mode {
@@ -20,204 +20,328 @@
     --label-color: #9ea0a8;
     --shader-background: black;
     --shader-border: #3a3a45;
-    --box-shadow: rgba(0,0,0,0.8);
+    --box-shadow: rgba(0, 0, 0, 0.8);
     --diagnostics-color: #c5c6d0;
 }
 
 /* ========================================================================== */
-/* ============================== DESKTOP VIEW ============================== */
+/* ============================== GLOBAL LAYOUT ============================== */
 /* ========================================================================== */
 
-/* Make the whole page center its content */
-    body {
-        margin: 0;
-        min-height: 100vh;
-        display: flex;
-        align-items: center;     
-        justify-content: center;  
-        background-color: var(--background);
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-                     Roboto, "Helvetica Neue", sans-serif;
-        color: var(--text-color);
-    }
-    
-    /* Wrapper so the title + app stay grouped */
-    .page-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem; /* space between heading and app */
-    }
+/* Make the whole page center its content but leave room for the top bar */
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 3.5rem;  /* same as .top-bar height */
+    background-color: var(--background);
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 Roboto, "Helvetica Neue", sans-serif;
+    color: var(--text-color);
+}
 
-    /* Heading & Dark/Light Mode Swticher */
-    #title {
-        display: flex;
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        width: 100%;
-        margin-top: 12px;
-    }
+/* Fixed top bar with title + theme switch */
+.top-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
 
-    #theme {
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-        width: auto;
-    }
+    height: 3.5rem;   /* banner height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
 
-    h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: var(--strong-color);
-        text-align: center;
-    }
-    
-    /* The main app panel */
-    #app {
-        display: flex;
-        flex-direction: row;
-        gap: 1.5rem;
-    
-        background-color: var(--app-background);
-        border: 1px solid var(--app-border);
-        border-radius: 12px;
-        padding: 1.25rem 1.5rem;
-    
-        box-shadow: 0 24px 48px var(--box-shadow);
-        max-width: 900px;
-        width: auto;
-        box-sizing: border-box;
-    
-        color: var(--text-color);
-        font-size: 0.9rem;
-        line-height: 1.4;
-    }
-    
-    #editor-container {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-    
-    #toggles {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        & label {
-            margin: 0px;
-        }
-    }
+    background-color: var(--background);
+    z-index: 1000;
+    box-shadow: 0 4px 12px var(--box-shadow);
+}
 
-    /* Canvas presentation */
-    #canvas-container {
-        align-items: center;
-    }
-    
-    #shader-canvas {
-        image-rendering: pixelated;
-        border: 1px solid var(--shader-border);
-        border-radius: 6px;
-        background-color: var(--shader-background);
-    }
-    
-    /* DPAD is for mobile users only */
-    #dpad {
-        display: none;
-    }
+h1 {
+    margin: 0;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--strong-color);
+}
 
-    /* Layout columns inside the app */
-    #right-side-panel {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
+/* Theme toggle container in the top bar */
+#theme {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    width: auto;
+}
 
-    /* Performance Metrics Title */
-    #right-side-panel > p {
-        margin: 0px;
-    }
-    
-    /* Diagnostics column */
-    #diagnostics {
-        font-size: 0.8rem;
-        color: var(--diagnostics-color);
-    }
-    
-    #diagnostics strong {
-        color: var(--strong-color);
-    }
-    
-    /* Style form controls a bit so dark mode isn't painful */
-    label {
-        display: block;
-        font-size: 0.8rem;
-        color: var(--label-color);
-        margin-bottom: 0.25rem;
-    }
-    
-    select {
-        background-color: var(--app-border);
-        color: var(--strong-color);
-        border: 1px solid var(--shader-border);
-        border-radius: 6px;
-        padding: 0.4rem 0.5rem;
-        font-size: 0.9rem;
-        min-width: 160px;
-    }
-    
-    #theme-switch {
-        height: 48px;
-        width: 48px;
-        padding: 0;
-        border-radius: 50%;
-        background-color: var(--app-border);
-        border: 1px solid var(--shader-border);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-    
-    /*What the button looks like when clicked*/
-    #theme-switch:active {
-        transform: scale(0.98);   /* tiny press */
-        filter: brightness(0.9);  /* darken a bit */
-    }
-    
-    #theme-switch svg{
-        fill: var(--strong-color)
-    }
-    
-    /* Hide the dark mode icon in light mode (default) */
-    #theme-switch svg:last-child {
-        display: none;
-    }
-    
-    /* In dark mode, show the dark mode icon and hide the light mode icon,
-    which correspond to the first and last child respectively*/
-    .dark-mode #theme-switch svg:first-child {
-        display: none;
-    }
-    
-    .dark-mode #theme-switch svg:last-child {
-        display: block;
-    }
- 
+/* Wrapper so the title + app stay grouped */
+.page-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem; /* space between heading/tabs and app panel */
+}
+
+/* ========================================================================== */
+/* ============================ PAGE TABS / VIEWS =========================== */
+/* ========================================================================== */
+
+#page-selection {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+}
+
+.selection-btn {
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid var(--app-border);
+    background-color: var(--app-background);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+
+    border-bottom: 2px solid transparent;
+}
+
+/* Hover state for non-active tab */
+.selection-btn:hover:not(.active) {
+    border-bottom-color: rgba(0, 0, 0, 0.04);
+}
+
+/* Slightly different hover in dark mode */
+.dark-mode .selection-btn:hover:not(.active) {
+    border-bottom-color: rgba(255, 255, 255, 0.07);
+}
+
+/* Active tab: underlined and a bit bolder */
+.selection-btn.active {
+    background-color: var(--app-border);
+    font-weight: 520;
+    text-decoration: underline;
+}
+
+.view {
+    display: none;
+}
+
+.view.active-view {
+    display: flex;
+}
+
+/* ========================================================================== */
+/* =============================== DESKTOP VIEW ============================== */
+/* ========================================================================== */
+
+/* The main app panel (Playground) */
+#app {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+
+    background-color: var(--app-background);
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+
+    box-shadow: 0 24px 48px var(--box-shadow);
+    max-width: 900px;
+    width: auto;
+    box-sizing: border-box;
+
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+#editor-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+#toggles {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#toggles label {
+    margin: 0;
+}
+
+/* Canvas presentation */
+#canvas-container {
+    align-items: center;
+}
+
+#shader-canvas {
+    image-rendering: pixelated;
+    border: 1px solid var(--shader-border);
+    border-radius: 6px;
+    background-color: var(--shader-background);
+}
+
+/* DPAD is for mobile users only (hidden on desktop) */
+#dpad {
+    display: none;
+}
+
+/* Layout columns inside the app */
+#right-side-panel {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+/* Performance Metrics Title */
+#right-side-panel > p {
+    margin: 0;
+}
+
+/* Diagnostics column */
+#diagnostics {
+    font-size: 0.8rem;
+    color: var(--diagnostics-color);
+}
+
+#diagnostics strong {
+    color: var(--strong-color);
+}
+
+/* Style form controls a bit so dark mode isn't painful */
+label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--label-color);
+    margin-bottom: 0.25rem;
+}
+
+select {
+    background-color: var(--app-border);
+    color: var(--strong-color);
+    border: 1px solid var(--shader-border);
+    border-radius: 6px;
+    padding: 0.4rem 0.5rem;
+    font-size: 0.9rem;
+    min-width: 160px;
+}
+
+/* Theme switch button */
+#theme-switch {
+    height: 48px;
+    width: 48px;
+    padding: 0;
+    border-radius: 50%;
+    background-color: var(--app-border);
+    border: 1px solid var(--shader-border);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* What the button looks like when clicked */
+#theme-switch:active {
+    transform: scale(0.98);   /* tiny press */
+    filter: brightness(0.9);  /* darken a bit */
+}
+
+#theme-switch svg {
+    fill: var(--strong-color);
+}
+
+/* Hide the dark mode icon in light mode (default) */
+#theme-switch svg:last-child {
+    display: none;
+}
+
+/* In dark mode, show the dark mode icon and hide the light mode icon */
+.dark-mode #theme-switch svg:first-child {
+    display: none;
+}
+
+.dark-mode #theme-switch svg:last-child {
+    display: block;
+}
+
+/* ========================================================================== */
+/* ============================ ANALYTICS LAYOUT ============================ */
+/* ========================================================================== */
+
+/* Analytics main panel */
+#analytics-app {
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+
+    background-color: var(--app-background);
+    border: 1px solid var(--app-border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+
+    box-shadow: 0 24px 48px var(--box-shadow);
+    max-width: 900px;
+    width: auto;
+    box-sizing: border-box;
+
+    color: var(--text-color);
+    font-size: 0.9rem;
+    line-height: 1.4;
+
+    align-items: flex-start;
+}
+
+/* Left column: options + canvas stacked */
+.analytics-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Options menu */
+.analytics-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    align-items: center;
+}
+
+/* Canvas under controls */
+.analytics-canvas-container {
+    margin-top: 0.5rem;
+}
+
+#analytics-canvas {
+    image-rendering: pixelated;
+    border: 1px solid var(--shader-border);
+    border-radius: 6px;
+    background-color: var(--shader-background);
+}
+
+/* Right-hand side for chart + metric select */
+.analytics-right {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    width: 400px;
+    align-content: center;
+    align-items: stretch;
+}
+
+#analytics-select {
+    align-self: center;
+    margin-top: 0.75rem;
+}
+
 /* ========================================================================== */
 /* =============================== MOBILE VIEW ============================== */
 /* ========================================================================== */
-/* min-width testing 320px */
 
 @media (max-width: 800px) {
-    /* Wrapper so the title + app stay grouped */
-    .page-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 1rem; /* space between heading and app */
-    }
-
     /* The main app panel */
     #app {
         display: flex;
@@ -250,7 +374,6 @@
         min-width: 100%;
     }
 
-
     /* Canvas presentation */
     #canvas-container {
         align-items: center;
@@ -261,6 +384,8 @@
         border: 1px solid var(--shader-border);
         border-radius: 6px;
         background-color: var(--shader-background);
+        max-width: 100%;
+        height: auto;
     }
 
     /* Mobile DPAD */
@@ -280,7 +405,6 @@
         color: var(--text-color);
         border-color: var(--app-background);
         border-radius: 6px;
-        /* make text unselectable */
         -webkit-user-select: none;
         user-select: none;
     }
@@ -323,7 +447,7 @@
 
     /* Performance Metrics Title */
     #right-side-panel > p {
-        margin: 0px;
+        margin: 0;
     }
 
     /* Diagnostics column */
@@ -340,45 +464,32 @@
     }
 
     #diagnostics > p {
-        margin: 0px;
+        margin: 0;
     }
 
     #controls {
-        display: none;
-        /* arrow key buttons to move camera around */
+        display: none; /* hide keyboard-controls hint on mobile */
     }
 
-    #diagnostics strong {
-        color: var(--strong-color);
-    }
-
-    #theme {
-        margin-top: auto;
-        display: flex;
-        justify-content: flex-end;
-        gap: 0.75rem;
-    }
-
-    /* Style form controls a bit so dark mode isn't painful */
-    label {
-        display: block;
-        font-size: 0.8rem;
-        color: var(--label-color);
-        margin-bottom: 0.25rem;
-    }
-
+    /* Style form controls a bit differently on mobile */
     select {
         background-color: var(--app-border);
         color: var(--strong-color);
         border: 1px solid var(--shader-border);
         border-radius: 6px;
-        padding: 6px 0px 6px 0px;
+        padding: 6px 0;
         font-size: 0.8rem;
+    }
+
+    /* Analytics panel stacks vertically on mobile */
+    #analytics-app {
+        flex-direction: column;
+        align-items: stretch;
     }
 }
 
+/* Smaller theme switch on tiny screens */
 @media (max-width: 400px) {
-    /* Theme Switching */
     #theme-switch {
         height: 36px;
         width: 36px;

@@ -99,7 +99,7 @@ let minData: number = -1;
 let maxData: number = -1;
 // Flag to avoid weird graph behaviour
 let skipNextSample = false;
-const AXIS_SCALE_FACTOR = 1.05;
+const AXIS_SCALE_FACTOR = 1.01;
 const DEFAULT_Y_MIN = 0;
 const DEFAULT_Y_MAX = 100;
 
@@ -414,7 +414,7 @@ async function render(time: number) {
         const desiredYMax = maxData * AXIS_SCALE_FACTOR;
 
         // snap to "nice" integer bounds based on desired range
-        const padding = (desiredYMax - desiredYMin) * 0.05 || 1;
+        const padding = (desiredYMax - desiredYMin) * 0.5 || 1;
 
         let yMin = Math.floor(desiredYMin - padding);
         let yMax = Math.ceil(desiredYMax + padding);
@@ -448,6 +448,16 @@ async function render(time: number) {
         while (data.length && data[0][0] < cutoff) data.shift();
 
         chart.updateSeries([{ data }]);
+
+        console.log({
+            selectedMetric,
+            chosenAnalytic,
+            minData,
+            maxData,
+            yMin,
+            yMax,
+            tickAmount,
+        });
     }
 
     requestAnimationFrame(render);
