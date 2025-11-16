@@ -104,8 +104,8 @@ let iterationsBuffer = new Uint16Array(width * height);
 let outputBuffer = new Uint8ClampedArray(width * height * 4); // RGBA
 
 // resolution scaling stuff
-let resolutionPower = 8; // default to 2^8 = 256 x 256
-const TARGET_DISPLAY_SIZE = 512; // Keep canvas display size around 512px
+let resolutionPower = 7; // default to 2^7 = 128 x 128
+const TARGET_DISPLAY_SIZE = 256; // Keep canvas display size around 256px
 const MIN_RESOLUTION_POWER = 4; // min res = 2^4 = 16 x 16
 const MAX_RESOLUTION_POWER = 10; // max res = 2^10 = 1024 x 1024
 let isResizing = false;

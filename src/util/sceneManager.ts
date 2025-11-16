@@ -122,6 +122,48 @@ export class SceneManager {
                 }
                 return spheres;
             })()
+        },
+        {
+            name: "Dense Box Grid",
+            objects: (() => {
+                const boxes = [];
+                const gridSize = 4;
+                const spacing = 0.8;
+                const offset = (gridSize - 1) * spacing / 2;
+                
+                for (let x = 0; x < gridSize; x++) {
+                    for (let y = 0; y < gridSize; y++) {
+                        for (let z = 0; z < gridSize; z++) {
+                            boxes.push(SceneManager.createBox(
+                                x * spacing - offset,
+                                y * spacing - offset,
+                                z * spacing - offset,
+                                vec3.fromValues(0.2, 0.2, 0.2)
+                            ));
+                        }
+                    }
+                }
+                return boxes;
+            })()
+        },
+        {
+            name: "Ring of Toruses",
+            objects: (() => {
+                const toruses = [];
+                const count = 8;
+                const radius = 1.5;
+                
+                for (let i = 0; i < count; i++) {
+                    const angle = (i / count) * Math.PI * 2;
+                    toruses.push(SceneManager.createTorus(
+                        Math.cos(angle) * radius,
+                        Math.sin(angle) * radius,
+                        0,
+                        0.4
+                    ));
+                }
+                return toruses;
+            })()
         }
     ];
 
