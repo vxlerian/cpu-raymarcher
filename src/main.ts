@@ -306,6 +306,7 @@ async function render(time: number) {
     //     frameCount = 0;
     //     lastFrame = now;
     // }
+    let frameLength = now - lastFrame;
     fpsDisplay.textContent = `Frame length: ${(now - lastFrame).toPrecision(4)}`;
     lastFrame = now;
 
@@ -332,18 +333,22 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
+    
+
+    let chosenAnalytic = averageIterations;
+
     if (skipNextSample) {
         skipNextSample = false;
     } else {
         const prevMin = minData;
         const prevMax = maxData;
 
-        if (minData === -1 || averageSDFCalls < minData) {
-            minData = averageSDFCalls;
+        if (minData === -1 || chosenAnalytic < minData) {
+            minData = chosenAnalytic;
         }
 
-        if (maxData === -1 || averageSDFCalls > maxData) {
-            maxData = averageSDFCalls;
+        if (maxData === -1 || chosenAnalytic > maxData) {
+            maxData = chosenAnalytic;
         }
                 
         const desiredYMin = Math.max(0, minData * (1 / AXIS_SCALE_FACTOR));
@@ -363,7 +368,7 @@ async function render(time: number) {
         const span = yMax - yMin;
         // ensures that we have the same number of ticks as there are integers
         // between max and min
-        const tickAmount = span;
+        const tickAmount = Math.min(span, 20);
 
         if (minData !== prevMin || maxData !== prevMax) {
             chart.updateOptions({
@@ -380,7 +385,7 @@ async function render(time: number) {
         }
 
         const cutoff = now - 12000;
-        data.push([now, averageSDFCalls]);
+        data.push([now, chosenAnalytic]);
         while (data.length && data[0][0] < cutoff) data.shift();
 
         chart.updateSeries([{ data }]);
