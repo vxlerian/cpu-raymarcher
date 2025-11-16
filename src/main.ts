@@ -210,6 +210,9 @@ function applyCanvasScale() {
 }
 applyCanvasScale();
 
+const CHART_FONT =
+  'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", ' +
+  'Roboto, "Helvetica Neue", sans-serif';
 // ApexCharts options
 var options = {
     series: data,
@@ -217,6 +220,7 @@ var options = {
         id: 'realtime',
         height: 350,
         type: 'line',
+        fontFamily: CHART_FONT,
         animations: {
             enabled: true,
             easing: 'linear',
@@ -228,7 +232,10 @@ var options = {
         zoom: { enabled: false }
     },
     dataLabels: { enabled: false },
-    stroke: { curve: 'smooth' },
+    stroke: { 
+        curve: 'smooth', 
+        width: 3
+    },
     title: {
         text: metricTitles[selectedMetric],
         align: 'left'
@@ -238,7 +245,10 @@ var options = {
         type: 'datetime',
         range: 12000,
         labels: { show: false }, 
-        axisTicks: { show: false }
+        axisTicks: { show: false },
+        title: {
+            text: 'Time'
+        }
     },
     yaxis: {
         min: DEFAULT_Y_MIN,
