@@ -101,6 +101,15 @@
         gap: 0.75rem;
     }
     
+    #toggles {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        & label {
+            margin: 0px;
+        }
+    }
+
     /* Canvas presentation */
     #canvas-container {
         align-items: center;
