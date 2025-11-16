@@ -103,7 +103,8 @@ function handleAlgorithmChange(selectedAlgo: string) {
     // reset data for new algorithm.
     data.length = 0;
     chart.updateSeries([{ data: [] }]);
-
+    minData = -1;
+    maxData = -1;
     skipNextSample = true;
 }
 
@@ -152,7 +153,8 @@ function handleSceneChange(index: number) {
     // Reset graph data
     data.length = 0
     chart.updateSeries([{data: []}])
-
+    minData = -1;
+    maxData = -1;
     skipNextSample = true;
 }
 
@@ -199,10 +201,13 @@ applyCanvasScale();
 // Graph data/options (using ApexCharts)
 // First, we'll just try with SDF calls.
 let data: [number, number][] = [];
+let minData: number = -1;
+let maxData: number = -1;
 // Flag to avoid weird graph behaviour
-let skipNextSample = false;
-let currentYMin = 0;
-let currentYMax = 100; 
+let skipNextSample = false; 
+const AXIS_SCALE_FACTOR = 1.05;
+const DEFAULT_Y_MIN = 0;
+const DEFAULT_Y_MAX = 100;
 
 var options = {
     series: data,
@@ -225,12 +230,14 @@ var options = {
     title: { text: 'Average SDF Calls', align: 'left' },
     markers: { size: 0 },
     xaxis: { 
+        type: 'datetime',
+        range: 12000,
         labels: { show: false }, 
         axisTicks: { show: false }
     },
     yaxis: {
-        min: currentYMin,
-        max: currentYMax,
+        min: DEFAULT_Y_MIN,
+        max: DEFAULT_Y_MAX,
         labels: {
             formatter: (value: number) => value.toFixed(0)
         }
@@ -350,36 +357,40 @@ async function render(time: number) {
     minSDFCallsDisplay.textContent = `Min SDF calls: ${minSDFCalls}`;
     averageIterationsDisplay.textContent = `Average iterations: ${averageIterations.toFixed(2)}`;
 
-    const desiredYMin = Math.max(0, averageSDFCalls - 10); // clamp at 0 if you like
-    const desiredYMax = averageSDFCalls + 10;
-
-    // Avoid degenerate range (min == max)
-    const safeYMax = desiredYMax <= desiredYMin ? desiredYMin + 1 : desiredYMax;
-
-    // Only change the ranges if they actually differ.
-    if (desiredYMin !== currentYMin || safeYMax !== currentYMax) {
-        currentYMin = desiredYMin;
-        currentYMax = safeYMax;
-
-        chart.updateOptions({
-            yaxis: {
-                min: currentYMin,
-                max: currentYMax,
-                labels: {
-                    formatter: (value: number) => value.toFixed(0)
-                }
-            }
-        }, false, false); // no full redraw/animation
-    }
-
     if (skipNextSample) {
         skipNextSample = false;
     } else {
-        data.push([now, averageSDFCalls]);
-        if (data.length > 12000) {
-            data.shift();
+        const prevMin = minData;
+        const prevMax = maxData;
+
+        if (minData === -1 || averageSDFCalls < minData) {
+            minData = averageSDFCalls;
         }
-        chart.updateSeries([{data: data}]);
+
+        if (maxData === -1 || averageSDFCalls > maxData) {
+            maxData = averageSDFCalls;
+        }
+
+        const desiredYMin = Math.max(0, minData * (1 / AXIS_SCALE_FACTOR));
+        const desiredYMax = maxData * AXIS_SCALE_FACTOR;
+
+        if (minData !== prevMin || maxData !== prevMax) {
+            chart.updateOptions({
+                yaxis: {
+                    min: desiredYMin,
+                    max: desiredYMax,
+                    labels: {
+                        formatter: (value: number) => value.toFixed(0)
+                    }
+                }
+            }, false, false);
+        }
+
+        const cutoff = now - 12000;
+        data.push([now, averageSDFCalls]);
+        while (data.length && data[0][0] < cutoff) data.shift();
+
+        chart.updateSeries([{ data }]);
     }
 
     // window.setInterval()
