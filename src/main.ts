@@ -283,6 +283,7 @@ var options = {
             formatter: (value: number) => value.toFixed(0)
         }
     },
+    tooltip: {enabled: false }, // Disable hovering
     legend: { show: false },
 };
 
