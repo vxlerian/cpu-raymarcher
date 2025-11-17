@@ -92,14 +92,15 @@ h1 {
     margin-top: 1rem;
     display: flex;
     flex-direction: row;
-    gap: 0.75rem;
+    align-items: flex-end;
+    gap: 0rem;
 }
 
 .selection-btn {
     padding: 0.4rem 0.9rem;
-    border-radius: 999px;
+    border-radius: 10px 10px 0px 0px;
     border: 1px solid var(--app-border);
-    background-color: var(--app-background);
+    background-color: var(--app-border);
     color: var(--text-color);
     font-size: 0.9rem;
     cursor: pointer;
@@ -109,23 +110,35 @@ h1 {
 
 /* Hover state for non-active tab */
 .selection-btn:hover:not(.active) {
-    border-bottom-color: rgba(0, 0, 0, 0.04);
+    border-top-color: rgba(0, 0, 0, 0.04);
 }
 
 /* Slightly different hover in dark mode */
 .dark-mode .selection-btn:hover:not(.active) {
-    border-bottom-color: rgba(255, 255, 255, 0.07);
+    border-top-color: rgba(255, 255, 255, 0.07);
 }
 
 /* Active tab: underlined and a bit bolder */
 .selection-btn.active {
+    background-color: var(--app-background);
+    font-weight: 700;
+}
+
+/* Have to invert this for dark mode :D */
+.dark-mode .selection-btn.active {
     background-color: var(--app-border);
-    font-weight: 520;
-    text-decoration: underline;
+    font-weight: 700;
+}
+
+/* Active tab: underlined and a bit bolder */
+.dark-mode .selection-btn:not(.active) {
+    background-color: var(--app-background);
+    font-weight: 700;
 }
 
 .view {
     display: none;
+    flex-direction: column;
 }
 
 .view.active-view {
@@ -144,7 +157,7 @@ h1 {
 
     background-color: var(--app-background);
     border: 1px solid var(--app-border);
-    border-radius: 12px;
+    border-radius: 0 12px;
     padding: 1.25rem 1.5rem;
 
     box-shadow: 0 24px 48px var(--box-shadow);
@@ -279,7 +292,7 @@ select {
 
     background-color: var(--app-background);
     border: 1px solid var(--app-border);
-    border-radius: 12px;
+    border-radius: 0px 12px;
     padding: 1.25rem 1.5rem;
 
     box-shadow: 0 24px 48px var(--box-shadow);
