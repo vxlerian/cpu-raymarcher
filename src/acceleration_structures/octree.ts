@@ -9,6 +9,7 @@ export class OctreeNode {
     public children: OctreeNode[] | null;
     public level: number;
     public isEmpty: boolean;
+    public minDistance: number; // estimated distance to nearest primitive outside this node
 
     constructor(bounds: BoundingBox, primitives: Primitive[], level: number) {
         this.bounds = bounds;
@@ -16,6 +17,7 @@ export class OctreeNode {
         this.children = null;
         this.level = level;
         this.isEmpty = true;
+        this.minDistance = 0;
     }
 
     public isLeaf(): boolean {
@@ -29,6 +31,7 @@ export class Octree implements AccelerationStructure {
     private maxPrimitivesPerNode: number;
     private primitives: Primitive[];
     private sceneBounds: BoundingBox;
+    private primitiveBounds: BoundingBox[];
 
     constructor(
         primitives: Primitive[],
@@ -40,8 +43,10 @@ export class Octree implements AccelerationStructure {
         this.maxPrimitivesPerNode = maxPrimitivesPerNode;
         this.primitives = primitives;
         this.sceneBounds = bounds;
+        // cache primitive bounds once
+        this.primitiveBounds = primitives.map(p => BoundingBox.fromPrimitive(p));
         this.root = this.buildNode(primitives, bounds, 0);
-        this.computeEmptySpace(this.root);
+        this.computeMinDistances(this.root);
     }
 
     private buildNode(
@@ -140,42 +145,49 @@ export class Octree implements AccelerationStructure {
         }
     }
     
-    // Compute empty space flags based on SDF evaluation
-    private computeEmptySpace(node: OctreeNode): void {
+    // Compute empty flags and minDistance values using bounding box distances
+    private computeMinDistances(node: OctreeNode): { hasPrims: boolean } {
         if (node.isLeaf()) {
-            // evaluate SDF to determine if node is actually empty
-            const center = node.bounds.center();
-            const sdf = this.evaluateSDF(center);
-            const diagonal = vec3.distance(node.bounds.min, node.bounds.max);
-            const threshold = diagonal * 0.5;
-            
-            // node is empty if center is far enough from any surface
-            node.isEmpty = sdf > threshold;
-            return;
-        }
-        
-        // recursively compute for children first
-        else if (node.children) {
-            let allChildrenEmpty = true;
-            for (const child of node.children) {
-                this.computeEmptySpace(child);
-                if (!child.isEmpty) {
-                    allChildrenEmpty = false;
+            const hasPrims = node.primitives.length > 0;
+            node.isEmpty = !hasPrims;
+            if (!hasPrims) {
+                // min distance to any primitive bounds in the node
+                let minD = Infinity;
+                for (let i = 0; i < this.primitiveBounds.length; i++) {
+                    const d = node.bounds.distanceToBox(this.primitiveBounds[i]);
+                    if (d < minD) minD = d;
                 }
+                node.minDistance = minD !== Infinity ? Math.max(0, minD) : 0;
+            } else {
+                node.minDistance = 0; // no primitives
             }
-            // mark parent as empty if all children are empty
-            node.isEmpty = allChildrenEmpty;
-        } 
-    }
-    
-    // evaluate SDF at a point by checking all primitives
-    private evaluateSDF(point: vec3): number {
-        let minDist = Infinity;
-        for (const primitive of this.primitives) {
-            const dist = primitive.sdf(point);
-            minDist = Math.min(minDist, dist);
+            return { hasPrims };
         }
-        return minDist;
+
+        // if we reach here this isn't a leaf and we are instead considering the 
+        // subtree of this node
+
+        // internal node: recurse
+        let subtreeHasPrims = false;
+        if (node.children) {
+            for (const child of node.children) {
+                const r = this.computeMinDistances(child);
+                if (r.hasPrims) subtreeHasPrims = true;
+            }
+        }
+        node.isEmpty = !subtreeHasPrims;
+        if (node.isEmpty) {
+            // conservative distance to any primitive bounds
+            let minD = Infinity;
+            for (let i = 0; i < this.primitiveBounds.length; i++) {
+                const d = node.bounds.distanceToBox(this.primitiveBounds[i]);
+                if (d < minD) minD = d;
+            }
+            node.minDistance = minD !== Infinity ? Math.max(0, minD) : 0;
+        } else {
+            node.minDistance = 0;
+        }
+        return { hasPrims: subtreeHasPrims };
     }
     
     // ray-box intersection for octree traversal
@@ -249,13 +261,16 @@ export class Octree implements AccelerationStructure {
             return 0; // outside octree, evaluate normally
         }
         
-        // if node is empty, skip to next node boundary
+        // if node is empty, we can skip by conservative minDistance, but not overly past box exit
+        // or it might skip the next one (this was very annoying)
         if (node.isEmpty) {
             const intersection = this.intersectRayBox(rayOrigin, rayDir, node.bounds);
             if (intersection) {
                 const [_, tExit] = intersection;
-                // skip to exit point plus small offset to enter new box
-                return Math.max(0, tExit - currentDist + 0.001);
+                const toExit = Math.max(0, tExit - currentDist);
+                const step = Math.max(0, Math.min(toExit, node.minDistance * 0.99)); // 0.99 for safety
+                // skip to exit point plus small offset to enter next node
+                return step > 0 ? step + 0.001 : 0;
             }
         }
         

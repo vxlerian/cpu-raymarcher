@@ -1,4 +1,4 @@
-import { vec3 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 import { Primitive } from "../util/primitives/primitive";
 
 // represents a bounding 3d area for primitives
@@ -27,6 +27,23 @@ export class BoundingBox {
             this.min[1] <= other.max[1] && this.max[1] >= other.min[1] &&
             this.min[2] <= other.max[2] && this.max[2] >= other.min[2]
         );
+    }
+
+    // distance between this box and another (0 if overlapping)
+    public distanceToBox(other: BoundingBox): number {
+        let dx = 0;
+        if (this.max[0] < other.min[0]) dx = other.min[0] - this.max[0]; // check ordering of the boxes
+        else if (other.max[0] < this.min[0]) dx = this.min[0] - other.max[0];
+
+        let dy = 0;
+        if (this.max[1] < other.min[1]) dy = other.min[1] - this.max[1];
+        else if (other.max[1] < this.min[1]) dy = this.min[1] - other.max[1];
+
+        let dz = 0;
+        if (this.max[2] < other.min[2]) dz = other.min[2] - this.max[2];
+        else if (other.max[2] < this.min[2]) dz = this.min[2] - other.max[2];
+
+        return Math.hypot(dx, dy, dz); // this function fire I don't have to do the sqrt thing now
     }
 
     // gets the center of the bounding box
@@ -59,11 +76,14 @@ export class BoundingBox {
         const worldPos = primitive.getWorldPosition();
         const localRadius = primitive.getLocalBoundingRadius();
 
-        // calculate rough scale by taking max of each direction
-        const transform = primitive.transform;
-        const scaleX = Math.sqrt(transform[0] * transform[0] + transform[1] * transform[1] + transform[2] * transform[2]);
-        const scaleY = Math.sqrt(transform[4] * transform[4] + transform[5] * transform[5] + transform[6] * transform[6]);
-        const scaleZ = Math.sqrt(transform[8] * transform[8] + transform[9] * transform[9] + transform[10] * transform[10]);
+        // calculate rough scale by taking max of each direction from local->world
+        // primitive.transform is world->local, so invert once here
+        const localToWorld = mat4.create();
+        const ok = mat4.invert(localToWorld, primitive.transform);
+        const m = ok ? localToWorld : primitive.transform; // just in-case its not invertible
+        const scaleX = Math.hypot(m[0], m[1], m[2]);
+        const scaleY = Math.hypot(m[4], m[5], m[6]);
+        const scaleZ = Math.hypot(m[8], m[9], m[10]);
         const maxScale = Math.max(scaleX, scaleY, scaleZ);
         
         // padding just in case :P

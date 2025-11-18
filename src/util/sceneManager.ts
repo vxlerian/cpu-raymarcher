@@ -11,21 +11,27 @@ export type Scene = {
 
 export class SceneManager {
     private static createSphere(x: number, y: number, z: number, radius: number): Sphere {
-        const transform = mat4.create();
-        mat4.fromRotationTranslationScale(transform, [0,0,0,1], [x,y,z], [1,1,1]);
-        return new Sphere(transform, radius);
+        const model = mat4.create();
+        mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
+        const worldToLocal = mat4.create();
+        mat4.invert(worldToLocal, model);
+        return new Sphere(worldToLocal, radius);
     }
 
     private static createBox(x: number, y: number, z: number, halfSize: vec3): Box {
-        const transform = mat4.create();
-        mat4.fromRotationTranslationScale(transform, [0,0,0,1], [x,y,z], [1,1,1]);
-        return new Box(transform, halfSize);
+        const model = mat4.create();
+        mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
+        const worldToLocal = mat4.create();
+        mat4.invert(worldToLocal, model);
+        return new Box(worldToLocal, halfSize);
     }
 
     private static createTorus(x: number, y: number, z: number, radius: number): Primitive {
-        const transform = mat4.create();
-        mat4.fromRotationTranslationScale(transform, [0,0,0,1], [x,y,z], [1,1,1]);
-        return new Torus(transform, radius, radius / 4);
+        const model = mat4.create();
+        mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
+        const worldToLocal = mat4.create();
+        mat4.invert(worldToLocal, model);
+        return new Torus(worldToLocal, radius, radius / 4);
     }
 
     public static readonly presets: Scene[] = [

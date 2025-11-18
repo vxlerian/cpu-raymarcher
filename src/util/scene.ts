@@ -73,12 +73,13 @@ export class Scene {
     }
 
     private calculateSceneBounds(): BoundingBox {
-        // return new BoundingBox(
-        //     vec3.fromValues(-3, -3, -3),
-        //     vec3.fromValues(3, 3, 3),
-        // );
+        return new BoundingBox(
+            vec3.fromValues(-10, -10, -10),
+            vec3.fromValues(10, 10, 10),
+        );
 
-        // might have to sack actual bounds checking - its way too slow
+        // might have to sack actual bounds checking - its somehow worse?
+        // TODO: look into if im calculating this incorrectly
 
         // calculate bounds dynamically based on all primitives in the scene
         const min = vec3.fromValues(Infinity, Infinity, Infinity);
@@ -132,13 +133,25 @@ export class Scene {
         let closestDistance = MAX_DIST;
         
         if (this.accelerationStructure === "Octree" && this.octree) {
-            // Octree-accelerated: only check nearby primitives (in current octreeNode)
-            const candidates = this.octree.getPrimitivesAt(position);
-            
-            // If no candidates found... do something
-            if (candidates.length == 0) return 0.2;
-            
-            for (const primitive of candidates) {
+            // Octree-accelerated: get the leaf node for this position
+            const node = this.octree.findNode(position);
+            if (node) {
+                if (node.primitives.length > 0) {
+                    // this node isn't empty we only compute sdfs of these ones
+                    // evaluate only primitives in this node
+                    for (const primitive of node.primitives) {
+                        if (sdfEvaluationCounter) sdfEvaluationCounter.count++;
+                        closestDistance = Math.min(primitive.sdf(position), closestDistance);
+                    }
+                } else if (node.isEmpty) {
+                    // empty node: use conservative precomputed minDistance
+                    const safety = 0.99; // avoid overshooting between nodes
+                    closestDistance = Math.min(closestDistance, node.minDistance * safety);
+                } 
+                return closestDistance;
+            }
+            // outside the octree bounds??? ig fall back to full evaluation
+            for (const primitive of this.objectSDFs) {
                 if (sdfEvaluationCounter) sdfEvaluationCounter.count++;
                 closestDistance = Math.min(primitive.sdf(position), closestDistance);
             }
@@ -146,7 +159,7 @@ export class Scene {
             // BVH-accelerated: only check nearby primitives
             const candidates = this.bvh.getPrimitivesAt(position);
             
-            // If no candidates found... do something
+            // If no candidates found... slowly step forward
             if (candidates.length == 0) return 0.2;
             
             for (const primitive of candidates) {
