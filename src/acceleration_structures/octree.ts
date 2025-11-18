@@ -1,59 +1,7 @@
 import { vec3 } from "gl-matrix";
 import { Primitive } from "../util/primitives/primitive";
-
-// represents a bounding 3d area for primitives
-export class BoundingBox {
-    public min: vec3;
-    public max: vec3;
-
-    constructor(min: vec3, max: vec3) {
-        this.min = vec3.clone(min);
-        this.max = vec3.clone(max);
-    }
-
-    // checks if the bounding box contains a point
-    public contains(point: vec3): boolean {
-        return (
-            point[0] >= this.min[0] && point[0] <= this.max[0] &&
-            point[1] >= this.min[1] && point[1] <= this.max[1] &&
-            point[2] >= this.min[2] && point[2] <= this.max[2]
-        );
-    }
-
-    // checks if two bounding boxes intersect with each other
-    public intersects(other: BoundingBox): boolean {
-        return (
-            this.min[0] <= other.max[0] && this.max[0] >= other.min[0] &&
-            this.min[1] <= other.max[1] && this.max[1] >= other.min[1] &&
-            this.min[2] <= other.max[2] && this.max[2] >= other.min[2]
-        );
-    }
-
-    // gets the center of the bounding box
-    public center(): vec3 {
-        return vec3.fromValues(
-            (this.min[0] + this.max[0]) / 2,
-            (this.min[1] + this.max[1]) / 2,
-            (this.min[2] + this.max[2]) / 2
-        );
-    }
-
-    // get a bounding box for a primitive using a sphere based on radius
-    public static fromPrimitive(primitive: Primitive): BoundingBox {
-        const worldPos = primitive.getWorldPosition();
-        const localRadius = primitive.getLocalBoundingRadius();
-
-        // TODO: currently doesn't account for scale of the object :(
-        
-        // add some padding just in case
-        const r = localRadius * 1.1;
-
-        return new BoundingBox(
-            vec3.fromValues(worldPos[0] - r, worldPos[1] - r, worldPos[2] - r),
-            vec3.fromValues(worldPos[0] + r, worldPos[1] + r, worldPos[2] + r)
-        );
-    }
-}
+import { BoundingBox } from "./boundingBox";
+import { AccelerationStructure } from "./accelerationStructure";
 
 export class OctreeNode {
     public bounds: BoundingBox;
@@ -71,7 +19,7 @@ export class OctreeNode {
     }
 }
 
-export class Octree {
+export class Octree implements AccelerationStructure {
     private root: OctreeNode;
     private maxDepth: number;
     private maxPrimitivesPerNode: number;

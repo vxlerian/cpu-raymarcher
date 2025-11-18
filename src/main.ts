@@ -155,16 +155,20 @@ if (analyticsAlgoSelect) {
 }
 
 // getting acceleration structure type (added analytics support)
-let accelerationStructure: "None" | "Octree" = "None";
+let accelerationStructure: "None" | "Octree" | "BVH" = "None";
 const octreeToggle = document.getElementById('octree-toggle') as HTMLInputElement | null;
+const bvhToggle = document.getElementById('bvh-toggle') as HTMLInputElement | null;
 const analyticsOctreeToggle = document.getElementById('analytics-octree-toggle') as HTMLInputElement | null;
+const analyticsBvhToggle = document.getElementById('analytics-bvh-toggle') as HTMLInputElement | null;
 
-function handleAccelerationToggle(checked: boolean) {
-    accelerationStructure = checked ? "Octree" : "None";
+function handleAccelerationToggle(type: "None" | "Octree" | "BVH") {
+    accelerationStructure = type;
 
-    // keep both checkboxes in sync
-    if (octreeToggle) octreeToggle.checked = checked;
-    if (analyticsOctreeToggle) analyticsOctreeToggle.checked = checked;
+    // keep checkboxes in sync
+    if (octreeToggle) octreeToggle.checked = (type === "Octree");
+    if (bvhToggle) bvhToggle.checked = (type === "BVH");
+    if (analyticsOctreeToggle) analyticsOctreeToggle.checked = (type === "Octree");
+    if (analyticsBvhToggle) analyticsBvhToggle.checked = (type === "BVH");
 
     // acceleration changes performance → reset graph
     resetGraph();
@@ -172,12 +176,24 @@ function handleAccelerationToggle(checked: boolean) {
 
 // Playground checkbox
 octreeToggle?.addEventListener('change', e => {
-    handleAccelerationToggle((e.target as HTMLInputElement).checked);
+    const checked = (e.target as HTMLInputElement).checked;
+    handleAccelerationToggle(checked ? "Octree" : "None");
+});
+
+bvhToggle?.addEventListener('change', e => {
+    const checked = (e.target as HTMLInputElement).checked;
+    handleAccelerationToggle(checked ? "BVH" : "None");
 });
 
 // Analytics checkbox
 analyticsOctreeToggle?.addEventListener('change', e => {
-    handleAccelerationToggle((e.target as HTMLInputElement).checked);
+    const checked = (e.target as HTMLInputElement).checked;
+    handleAccelerationToggle(checked ? "Octree" : "None");
+});
+
+analyticsBvhToggle?.addEventListener('change', e => {
+    const checked = (e.target as HTMLInputElement).checked;
+    handleAccelerationToggle(checked ? "BVH" : "None");
 });
 
 // Timing for FPS

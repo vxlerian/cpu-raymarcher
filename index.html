@@ -84,6 +84,10 @@
                                 <input type="checkbox" id="octree-toggle" name="octree">
                                 Use Octree Acceleration
                             </label>
+                            <label for="bvh-toggle">
+                                <input type="checkbox" id="bvh-toggle" name="bvh">
+                                Use BVH Acceleration
+                            </label>
                         </div>
 
                         <div>
@@ -105,7 +109,7 @@
                     </div>
 
                     <div id="canvas-container">
-                        <canvas id="shader-canvas" width="256" height="256"></canvas>
+                        <canvas id="shader-canvas" width="128" height="128"></canvas>
                         <!-- Resolution is currently fixed but can be user-selectable later. -->
                     </div>
 
@@ -143,7 +147,7 @@
                 <div id="analytics-app">
                     <div class="analytics-left">
                         <div class="analytics-canvas-container">
-                            <canvas id="analytics-canvas" width="256" height="256"></canvas>
+                            <canvas id="analytics-canvas" width="128" height="128"></canvas>
                         </div>
                         <div class="analytics-controls">
                             <div>
@@ -159,6 +163,13 @@
                            <label>
                               <input type="checkbox" id="analytics-octree-toggle">
                               Use octree acceleration
+                           </label>
+                           </div>
+
+                           <div>
+                           <label>
+                              <input type="checkbox" id="analytics-bvh-toggle">
+                              Use BVH acceleration
                            </label>
                            </div>
 
