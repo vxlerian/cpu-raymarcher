@@ -365,7 +365,7 @@ select {
 
         background-color: var(--app-background);
         border: 1px solid var(--app-border);
-        border-radius: 12px;
+        border-radius: 0 12px;
         padding: 12px 12px;
 
         box-shadow: 0 24px 48px var(--box-shadow);
@@ -497,7 +497,15 @@ select {
     /* Analytics panel stacks vertically on mobile */
     #analytics-app {
         flex-direction: column;
+        border-radius: 0 12px;
         align-items: stretch;
+    }
+
+    .analytics-canvas-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
     }
 }
 
