@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Raymarcher Visualiser</title>
     <!-- donut -->
-    <link rel="icon" type="image/x-icon" href="/raymarcher-test/favicon.ico">
-  <script type="module" crossorigin src="/raymarcher-test/assets/index-D9WxbfDO.js"></script>
+    <link rel="icon" type="image/x-icon" href="/raymarcher-test/favicon.ico">
+  <script type="module" crossorigin src="/raymarcher-test/assets/index-C_GyTk-T.js"></script>
   <link rel="stylesheet" crossorigin href="/raymarcher-test/assets/index-BKqJveYg.css">
 </head>
 <body>
@@ -83,6 +83,10 @@
                                 <input type="checkbox" id="octree-toggle" name="octree">
                                 Use Octree Acceleration
                             </label>
+                            <label for="bvh-toggle">
+                                <input type="checkbox" id="bvh-toggle" name="bvh">
+                                Use BVH Acceleration
+                            </label>
                         </div>
 
                         <div>
@@ -104,7 +108,7 @@
                     </div>
 
                     <div id="canvas-container">
-                        <canvas id="shader-canvas" width="256" height="256"></canvas>
+                        <canvas id="shader-canvas" width="128" height="128"></canvas>
                         <!-- Resolution is currently fixed but can be user-selectable later. -->
                     </div>
 
@@ -142,7 +146,7 @@
                 <div id="analytics-app">
                     <div class="analytics-top">
                         <div class="analytics-canvas-container">
-                            <canvas id="analytics-canvas" width="256" height="256"></canvas>
+                            <canvas id="analytics-canvas" width="128" height="128"></canvas>
                         </div>
                         
                         <div id="chart"></div>
@@ -155,6 +159,12 @@
                                 Use octree acceleration
                             </label>
                         </div>
+                        <div>
+                           <label>
+                              <input type="checkbox" id="analytics-bvh-toggle">
+                              Use BVH acceleration
+                           </label>
+                           </div>
                         <!-- made each option its own selection, to get a 2x2 grid -->
                         <div class="analytics-controls-grid">
                             <div>
@@ -165,6 +175,7 @@
                                     <option value="adaptive-step">Adaptive Step</option>
                                 </select>
                             </div>
+
                             <div>
                                 <label for="analytics-scene-select">Select scene: </label>
                                 <select name="selectedScene" id="analytics-scene-select"></select>
@@ -193,6 +204,6 @@
             </div>
         </div> <!-- /#views -->
     </div> <!-- /.page-wrapper -->
-
+
 </body>
 </html>
