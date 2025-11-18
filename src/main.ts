@@ -284,7 +284,7 @@ var options = {
     dataLabels: { enabled: false },
     stroke: { 
         curve: 'smooth', 
-        width: 3
+        width: 2
     },
     title: {
         text: metricTitles[selectedMetric],
@@ -356,7 +356,7 @@ async function render(time: number) {
     const analyticsView = document.getElementById("analytics-view");
     const isAnalyticsActive = analyticsView?.classList.contains("active-view");
     if (isAnalyticsActive) {
-        const rotationSpeed = 0.1;
+        const rotationSpeed = 0.015;
         scene.camera.rotateCamera(0, rotationSpeed);
     }
     
