@@ -81,7 +81,7 @@ if (metricSelect) {
     metricSelect.addEventListener('change', (e) => {
         const value = (e.target as HTMLSelectElement).value as AnalyticMetric;
         selectedMetric = value;
-        
+
         // Reset the graph
         resetGraph();
         chart.updateOptions({
@@ -121,6 +121,9 @@ function handleAlgorithmChange(selectedAlgo: string) {
     switch (selectedAlgo) {
         case 'fixed-step':
             algorithm = 'fixed-step';
+            break;
+        case 'adaptive-step':
+            algorithm = 'adaptive-step';
             break;
         case 'sphere-tracing':
         default:
@@ -467,7 +470,7 @@ async function render(time: number) {
         if (maxData === -1 || chosenAnalytic > maxData) {
             maxData = chosenAnalytic;
         }
-                
+
         const desiredYMin = Math.max(0, minData * (1 / AXIS_SCALE_FACTOR));
         const desiredYMax = maxData * AXIS_SCALE_FACTOR;
 
@@ -491,7 +494,7 @@ async function render(time: number) {
             currentYMin = yMin;
             currentYMax = yMax;
             currentTickAmount = tickAmount;
-            
+
             chart.updateOptions({
                 yaxis: {
                     min: yMin,
