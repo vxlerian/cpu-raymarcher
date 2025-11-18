@@ -145,11 +145,29 @@
             <div id="analytics-view" class="view">
                 <!-- View selection -->
                 <div id="analytics-app">
-                    <div class="analytics-left">
+                    <div class="analytics-top">
                         <div class="analytics-canvas-container">
                             <canvas id="analytics-canvas" width="128" height="128"></canvas>
                         </div>
-                        <div class="analytics-controls">
+                        
+                        <div id="chart"></div>
+                    </div>
+
+                    <div class="analytics-bottom">
+                        <div class="analytics-acceleration">
+                            <label>
+                                <input type="checkbox" id="analytics-octree-toggle">
+                                Use octree acceleration
+                            </label>
+                        </div>
+                        <div>
+                           <label>
+                              <input type="checkbox" id="analytics-bvh-toggle">
+                              Use BVH acceleration
+                           </label>
+                           </div>
+                        <!-- made each option its own selection, to get a 2x2 grid -->
+                        <div class="analytics-controls-grid">
                             <div>
                                 <label for="analytics-algorithm">Select algorithm: </label>
                                 <select name="selectedAlgo" id="analytics-algorithm">
@@ -159,25 +177,9 @@
                                 </select>
                             </div>
 
-                           <div>
-                           <label>
-                              <input type="checkbox" id="analytics-octree-toggle">
-                              Use octree acceleration
-                           </label>
-                           </div>
-
-                           <div>
-                           <label>
-                              <input type="checkbox" id="analytics-bvh-toggle">
-                              Use BVH acceleration
-                           </label>
-                           </div>
-
                             <div>
                                 <label for="analytics-scene-select">Select scene: </label>
-                                <select name="selectedScene" id="analytics-scene-select">
-                                    <!-- Will also be filled in main.ts -->
-                                </select>
+                                <select name="selectedScene" id="analytics-scene-select"></select>
                             </div>
                             <div>
                                 <label for="analytics-shading-model">Shading model: </label>
@@ -188,20 +190,15 @@
                                     <option value="iteration-heatmap">Iteration Heatmap</option>
                                 </select>
                             </div>
-                        </div>
-                    </div>
-
-                    <div class="analytics-right">
-                        <div id="chart"></div>
-
-                        <div id="analytics-select">
-                            Select metric: &nbsp;
-                            <select id="analytics-menu">
-                                <option value="avg-sdf">Average SDF Calls</option>
-                                <option value="max-sdf">Max SDF Calls</option>
-                                <option value="frame-length">Frame Length</option>
-                                <option value="avg-iters">Average Iterations</option>
-                            </select>
+                            <div>
+                                <label for="analytics-menu">Select metric: </label>
+                                <select id="analytics-menu">
+                                    <option value="avg-sdf">Average SDF Calls</option>
+                                    <option value="max-sdf">Max SDF Calls</option>
+                                    <option value="frame-length">Frame Length</option>
+                                    <option value="avg-iters">Average Iterations</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
