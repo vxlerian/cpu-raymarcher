@@ -378,6 +378,7 @@ select {
     justify-content: center;
 }
 
+/* Can be removed if needed */
 #chart {
     max-width: 450px;
     align-items: flex;
