@@ -249,7 +249,7 @@ const outputBuffer = new Uint8ClampedArray(width * height * 4); // RGBA
 const analyticsOutputBuffer = new Uint8ClampedArray(width * height * 4);
 
 // Display scaling: keep internal resolution (width x height), scale via CSS only
-let displayScale = 1.0; // 1x = native internal size
+let displayScale = 2.0; // 2x = native internal size
 function applyCanvasScale() {
     canvas.style.width = `${width * displayScale}px`;
     canvas.style.height = `${height * displayScale}px`;

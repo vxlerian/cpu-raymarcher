@@ -7,11 +7,15 @@ export class OctreeNode {
     public bounds: BoundingBox;
     public primitives: Primitive[];
     public children: OctreeNode[] | null;
+    public level: number;
+    public isEmpty: boolean;
 
-    constructor(bounds: BoundingBox, primitives: Primitive[]) {
+    constructor(bounds: BoundingBox, primitives: Primitive[], level: number) {
         this.bounds = bounds;
         this.primitives = primitives;
         this.children = null;
+        this.level = level;
+        this.isEmpty = true;
     }
 
     public isLeaf(): boolean {
@@ -23,6 +27,8 @@ export class Octree implements AccelerationStructure {
     private root: OctreeNode;
     private maxDepth: number;
     private maxPrimitivesPerNode: number;
+    private primitives: Primitive[];
+    private sceneBounds: BoundingBox;
 
     constructor(
         primitives: Primitive[],
@@ -32,7 +38,10 @@ export class Octree implements AccelerationStructure {
     ) {
         this.maxDepth = maxDepth;
         this.maxPrimitivesPerNode = maxPrimitivesPerNode;
+        this.primitives = primitives;
+        this.sceneBounds = bounds;
         this.root = this.buildNode(primitives, bounds, 0);
+        this.computeEmptySpace(this.root);
     }
 
     private buildNode(
@@ -40,7 +49,7 @@ export class Octree implements AccelerationStructure {
         bounds: BoundingBox,
         depth: number
     ): OctreeNode {
-        const node = new OctreeNode(bounds, []);
+        const node = new OctreeNode(bounds, [], depth);
 
         // if valid leaf make it a leaf node
         if (depth >= this.maxDepth || primitives.length <= this.maxPrimitivesPerNode) {
@@ -95,7 +104,8 @@ export class Octree implements AccelerationStructure {
                 node.children.push(this.buildNode(childPrimitives[i], childBounds[i], depth + 1));
             } else {
                 // create empty leaf for null children
-                node.children.push(new OctreeNode(childBounds[i], []));
+                const emptyNode = new OctreeNode(childBounds[i], [], depth + 1);
+                node.children.push(emptyNode);
             }
         }
 
@@ -128,5 +138,127 @@ export class Octree implements AccelerationStructure {
                 this.queryNode(child, point, results);
             }
         }
+    }
+    
+    // Compute empty space flags based on SDF evaluation
+    private computeEmptySpace(node: OctreeNode): void {
+        if (node.isLeaf()) {
+            // evaluate SDF to determine if node is actually empty
+            const center = node.bounds.center();
+            const sdf = this.evaluateSDF(center);
+            const diagonal = vec3.distance(node.bounds.min, node.bounds.max);
+            const threshold = diagonal * 0.5;
+            
+            // node is empty if center is far enough from any surface
+            node.isEmpty = sdf > threshold;
+            return;
+        }
+        
+        // recursively compute for children first
+        else if (node.children) {
+            let allChildrenEmpty = true;
+            for (const child of node.children) {
+                this.computeEmptySpace(child);
+                if (!child.isEmpty) {
+                    allChildrenEmpty = false;
+                }
+            }
+            // mark parent as empty if all children are empty
+            node.isEmpty = allChildrenEmpty;
+        } 
+    }
+    
+    // evaluate SDF at a point by checking all primitives
+    private evaluateSDF(point: vec3): number {
+        let minDist = Infinity;
+        for (const primitive of this.primitives) {
+            const dist = primitive.sdf(point);
+            minDist = Math.min(minDist, dist);
+        }
+        return minDist;
+    }
+    
+    // ray-box intersection for octree traversal
+    // returns [tEnter, tExit] or null if no intersection
+    public intersectRayBox(rayOrigin: vec3, rayDir: vec3, box: BoundingBox): [number, number] | null {
+        const tMin = vec3.create();
+        const tMax = vec3.create();
+        
+        for (let i = 0; i < 3; i++) {
+            const invD = 1.0 / rayDir[i];
+            let t0 = (box.min[i] - rayOrigin[i]) * invD;
+            let t1 = (box.max[i] - rayOrigin[i]) * invD;
+            
+            if (invD < 0.0) {
+                [t0, t1] = [t1, t0];
+            }
+            
+            tMin[i] = t0;
+            tMax[i] = t1;
+        }
+        
+        const tEnter = Math.max(tMin[0], tMin[1], tMin[2]);
+        const tExit = Math.min(tMax[0], tMax[1], tMax[2]);
+        
+        if (tEnter > tExit || tExit < 0) {
+            return null;
+        }
+        
+        return [Math.max(0, tEnter), tExit];
+    }
+    
+    // find the octree node containing a point
+    public findNode(point: vec3): OctreeNode | null {
+        return this.findNodeRecursive(this.root, point);
+    }
+    
+    private findNodeRecursive(node: OctreeNode, point: vec3): OctreeNode | null {
+        if (!node.bounds.contains(point)) {
+            return null;
+        }
+        
+        // if its a leaf or at max depth, return this node
+        if (node.isLeaf() || node.level === this.maxDepth) {
+            return node;
+        }
+        
+        // traverse to children
+        if (node.children) {
+            for (const child of node.children) {
+                const found = this.findNodeRecursive(child, point);
+                if (found) {
+                    return found;
+                }
+            }
+        }
+        
+        return node;
+    }
+    
+    // march a ray through the octree, skipping empty nodes
+    // returns distance to skip or 0 if we should evaluate normally (normal algo)
+    public marchRay(rayOrigin: vec3, rayDir: vec3, currentDist: number): number {
+        // get current position along ray
+        const currentPos = vec3.create();
+        vec3.scaleAndAdd(currentPos, rayOrigin, rayDir, currentDist);
+        
+        // find node at current position
+        const node = this.findNode(currentPos);
+        
+        if (!node) {
+            return 0; // outside octree, evaluate normally
+        }
+        
+        // if node is empty, skip to next node boundary
+        if (node.isEmpty) {
+            const intersection = this.intersectRayBox(rayOrigin, rayDir, node.bounds);
+            if (intersection) {
+                const [_, tExit] = intersection;
+                // skip to exit point plus small offset to enter new box
+                return Math.max(0, tExit - currentDist + 0.001);
+            }
+        }
+        
+        return 0; // node is not empty, evaluate normally
     }
 }

@@ -114,6 +114,16 @@ export class AdaptiveStep extends Raymarcher {
             const p = vec3.create();
             vec3.scaleAndAdd(p, rayOrigin, direction, totalDist);
 
+            // Octree acceleration: skip empty space
+            if (scene.accelerationStructure === "Octree" && scene.octree) {
+                const skipDist = scene.octree.marchRay(rayOrigin, direction, totalDist);
+                if (skipDist > 0) {
+                    totalDist += skipDist;
+                    if (totalDist > MAX_DIST) break;
+                    continue;
+                }
+            }
+            
             const dist = this.getSceneDistance(scene, p, idx, SDFevaluationBuffer);
             iterationsBuffer[idx] += 1;
 
