@@ -252,7 +252,7 @@ var options = {
     series: data,
     chart: {
         id: 'realtime',
-        height: 350,
+        height: 275,
         type: 'line',
         fontFamily: CHART_FONT,
         animations: {
