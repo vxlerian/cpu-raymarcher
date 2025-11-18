@@ -41,6 +41,7 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
                  Roboto, "Helvetica Neue", sans-serif;
     color: var(--text-color);
+    overflow-y: hidden;
 }
 
 /* Fixed top bar with title + theme switch */
