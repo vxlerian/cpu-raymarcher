@@ -4,34 +4,46 @@ import { Sphere } from "./primitives/sphere";
 import { Box } from "./primitives/box";
 import { Torus } from "./primitives/torus";
 
+import { SmoothUnion } from "./primitive_operations/smoothUnion";
+import { Twist } from "./primitive_operations/twist";
+import { Round } from "./primitive_operations/round";
+
 export type Scene = {
     name: string;
     objects: Primitive[];
 };
 
 export class SceneManager {
-    private static createSphere(x: number, y: number, z: number, radius: number): Sphere {
+    private static getTransform(x: number, y: number, z: number) {
         const model = mat4.create();
         mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
         const worldToLocal = mat4.create();
         mat4.invert(worldToLocal, model);
-        return new Sphere(worldToLocal, radius);
+        return worldToLocal
+    }
+
+    private static createSphere(x: number, y: number, z: number, radius: number): Sphere {
+        return new Sphere(SceneManager.getTransform(x, y, z), radius);
     }
 
     private static createBox(x: number, y: number, z: number, halfSize: vec3): Box {
-        const model = mat4.create();
-        mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
-        const worldToLocal = mat4.create();
-        mat4.invert(worldToLocal, model);
-        return new Box(worldToLocal, halfSize);
+        return new Box(SceneManager.getTransform(x, y, z), halfSize);
     }
 
     private static createTorus(x: number, y: number, z: number, radius: number): Primitive {
-        const model = mat4.create();
-        mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
-        const worldToLocal = mat4.create();
-        mat4.invert(worldToLocal, model);
-        return new Torus(worldToLocal, radius, radius / 4);
+        return new Torus(SceneManager.getTransform(x, y, z), radius, radius / 4);
+    }
+
+    private static createSmoothUnion(prim1: Primitive, prim2: Primitive, k: number) {
+        return new SmoothUnion(prim1, prim2, k);
+    }
+
+    private static createTwist(primitive: Primitive, twistAmount: number) {
+        return new Twist(primitive, twistAmount);
+    }
+
+    private static createRound(primitive: Primitive, radius: number) {
+        return new Round(primitive, radius);
     }
 
     public static readonly presets: Scene[] = [
@@ -128,6 +140,52 @@ export class SceneManager {
                 }
                 return spheres;
             })()
+        },
+        {
+            name: "Smooth Union",
+            objects: [
+                SceneManager.createSmoothUnion(
+                   SceneManager.createSphere(0,0,0,0.5),
+                   SceneManager.createBox(0,0.5,0,vec3.fromValues(1, 0.2, 1)),
+                   0.2
+                )
+            ]
+        },
+        {
+            name: "Rounded Box",
+            objects: [
+                SceneManager.createRound(
+                    SceneManager.createBox(0, 0, 0, vec3.fromValues(0.4, 0.4, 0.4)),
+                    0.3
+                )
+            ]
+        },
+        {
+            name: "Screw",
+            objects: [
+                SceneManager.createRound(
+                    SceneManager.createTwist(
+                        SceneManager.createBox(0, 0, 0, vec3.fromValues(0.4, 1.5, 0.4)),
+                        4.0
+                    ),
+                    0.1
+                )
+            ]
+        },
+        {
+            name: "Chicken",
+            objects: [
+                SceneManager.createBox(0,0,0, vec3.fromValues(0.6, 0.6, 0.8)),
+                SceneManager.createBox(0,-0.2,0, vec3.fromValues(0.8, 0.4, 0.6)),
+                SceneManager.createBox(0,-0.8,0.8, vec3.fromValues(0.4, 0.6, 0.3)),
+                SceneManager.createBox(0,-0.8,1.2, vec3.fromValues(0.4, 0.2, 0.2)),
+                SceneManager.createBox(0,-0.4,1.0, vec3.fromValues(0.2, 0.2, 0.2)),
+                SceneManager.createBox(0.3,1,0, vec3.fromValues(0.1, 0.6, 0.01)),
+                SceneManager.createBox(-0.3,1,0, vec3.fromValues(0.1, 0.6, 0.01)),
+                SceneManager.createBox(0,1.6,0.2, vec3.fromValues(0.6, 0.01, 0.2)),
+                SceneManager.createBox(0.3,1.6,0.5, vec3.fromValues(0.1, 0.01, 0.1)),
+                SceneManager.createBox(-0.3,1.6,0.5, vec3.fromValues(0.1, 0.01, 0.1)),
+            ]
         }
     ];
 
