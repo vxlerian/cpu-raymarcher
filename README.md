@@ -75,6 +75,6 @@ So far, only CPU raymarchers with threading has been implemented. In the future,
 * GPU raymarchers, 
 * CRUD for objects, and
 * More details diagnostic data including comparing different algorithms. 
-* 
+
 For now, algorithms can be compared by using the SDF evaluations and iterations heatmaps.
 
