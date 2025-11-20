@@ -7,6 +7,8 @@ import { Torus } from "./primitives/torus";
 import { SmoothUnion } from "./primitive_operations/smoothUnion";
 import { Twist } from "./primitive_operations/twist";
 import { Round } from "./primitive_operations/round";
+import { SmoothSubtraction } from "./primitive_operations/smoothSubstraction";
+import { Repetition } from "./primitive_operations/repetition";
 
 export type Scene = {
     name: string;
@@ -38,12 +40,20 @@ export class SceneManager {
         return new SmoothUnion(prim1, prim2, k);
     }
 
+    private static createSmoothSubtract(prim1: Primitive, prim2: Primitive, k: number) {
+        return new SmoothSubtraction(prim1, prim2, k);
+    }
+
     private static createTwist(primitive: Primitive, twistAmount: number) {
         return new Twist(primitive, twistAmount);
     }
 
     private static createRound(primitive: Primitive, radius: number) {
         return new Round(primitive, radius);
+    }
+
+    private static createRepetition(primitive: Primitive, spacing: vec3) {
+        return new Repetition(primitive, spacing);
     }
 
     public static readonly presets: Scene[] = [
@@ -152,6 +162,19 @@ export class SceneManager {
             ]
         },
         {
+            name: "Smooth Subtraction",
+            objects: [
+                SceneManager.createSmoothSubtract(
+                    SceneManager.createRound(
+                        SceneManager.createBox(0,0,0,vec3.fromValues(1, 0.3, 1)),
+                        0.1
+                    ),
+                    SceneManager.createSphere(0,-0.6,0,0.5),
+                    0.2
+                )
+            ]
+        },
+        {
             name: "Rounded Box",
             objects: [
                 SceneManager.createRound(
@@ -185,6 +208,36 @@ export class SceneManager {
                 SceneManager.createBox(0,1.6,0.2, vec3.fromValues(0.6, 0.01, 0.2)),
                 SceneManager.createBox(0.3,1.6,0.5, vec3.fromValues(0.1, 0.01, 0.1)),
                 SceneManager.createBox(-0.3,1.6,0.5, vec3.fromValues(0.1, 0.01, 0.1)),
+            ]
+        },
+        {
+            name: "Infinite Spheres",
+            objects: [
+                SceneManager.createRepetition(
+                    SceneManager.createSphere(0, 0, 0, 0.3),
+                    vec3.fromValues(1.5, 1.5, 1.5)
+                )
+            ]
+        },
+        {
+            name: "Infinite Rounded Boxes",
+            objects: [
+                SceneManager.createRepetition(
+                    SceneManager.createRound(
+                        SceneManager.createBox(0, 0, 0, vec3.fromValues(0.3, 0.3, 0.3)),
+                        0.1
+                    ),
+                    vec3.fromValues(2.0, 2.0, 2.0)
+                )
+            ]
+        },
+        {
+            name: "Infinite Torus Grid",
+            objects: [
+                SceneManager.createRepetition(
+                    SceneManager.createTorus(0, 0, 0, 0.5),
+                    vec3.fromValues(2.5, 2.5, 2.5)
+                )
             ]
         }
     ];
