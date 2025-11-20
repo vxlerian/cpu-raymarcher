@@ -37,4 +37,9 @@ export class SmoothSubtraction extends Primitive {
         // use only the first primitive's bounding radius for subtraction
         return this.prim1.getLocalBoundingRadius();
     }
+
+    getWorldPosition(): vec3 {
+        // use the first primitive's position
+        return this.prim1.getWorldPosition();
+    }
 }

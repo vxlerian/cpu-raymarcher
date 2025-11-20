@@ -6,7 +6,7 @@ export class Round extends Primitive {
     radius: number;
 
     constructor(primitive: Primitive, radius: number) {
-        super(mat4.create());
+        super(primitive.transform);
         this.primitive = primitive;
         this.radius = radius;
     }
@@ -26,5 +26,10 @@ export class Round extends Primitive {
     getLocalBoundingRadius(): number {
         // bounding radius increases by the rounding amount
         return this.primitive.getLocalBoundingRadius() + this.radius;
+    }
+
+    getWorldPosition(): vec3 {
+        // use wrapped primitive world position
+        return this.primitive.getWorldPosition();
     }
 }

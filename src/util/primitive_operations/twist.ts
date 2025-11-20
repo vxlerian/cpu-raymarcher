@@ -6,7 +6,7 @@ export class Twist extends Primitive {
     twistAmount: number;
 
     constructor(primitive: Primitive, twistAmount: number = 10.0) {
-        super(mat4.create());
+        super(primitive.transform);
         this.primitive = primitive;
         this.twistAmount = twistAmount;
     }
@@ -38,5 +38,10 @@ export class Twist extends Primitive {
     getLocalBoundingRadius(): number {
         // i think we can keep this the same?
         return this.primitive.getLocalBoundingRadius();
+    }
+
+    getWorldPosition(): vec3 {
+        // same world position as primitive
+        return this.primitive.getWorldPosition();
     }
 }

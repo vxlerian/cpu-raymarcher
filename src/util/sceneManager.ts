@@ -127,9 +127,9 @@ export class SceneManager {
         {
             name: "Pyramid of Boxes",
             objects: [
-                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
+                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
                 SceneManager.createBox(0, 0, 0, vec3.fromValues(0.6, 0.25, 0.6)),
-                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
+                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
             ]
         },
         {
@@ -255,22 +255,22 @@ export class SceneManager {
             objects: [
                 // 6
                 SceneManager.createRound(
-                    SceneManager.createBox(-1.3,-0.8,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/5)),
+                    SceneManager.createBox(-1.25,-0.8,0, vec3.fromValues(0.05,0.7,0.05), vec3.fromValues(0,0,Math.PI/5)),
                     0.20
                 ),
                 SceneManager.createRound(
-                    SceneManager.createTorus(-1.3,0.5,0,0.8, vec3.fromValues(-Math.PI/2, 0, 0)),
+                    SceneManager.createTorus(-1.25,0.5,0,0.8, vec3.fromValues(-Math.PI/2, 0, 0)),
                     0.05
                 ),
 
 
                 // 7
                 SceneManager.createRound(
-                    SceneManager.createBox(1.4,0,0, vec3.fromValues(0.05,1.5,0.05), vec3.fromValues(0,0,Math.PI/7)),
+                    SceneManager.createBox(1.35,0,0, vec3.fromValues(0.05,1.5,0.05), vec3.fromValues(0,0,Math.PI/7)),
                     0.20
                 ),
                 SceneManager.createRound(
-                    SceneManager.createBox(1.3,-1.4,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/2)),
+                    SceneManager.createBox(1.25,-1.4,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/2)),
                     0.20
                 )
             ]

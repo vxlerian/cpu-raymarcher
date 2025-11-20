@@ -6,7 +6,7 @@ export class Repetition extends Primitive {
     spacing: vec3;
 
     constructor(primitive: Primitive, spacing: vec3) {
-        super(mat4.create());
+        super(primitive.transform);
         this.primitive = primitive;
         this.spacing = spacing;
     }
@@ -29,12 +29,12 @@ export class Repetition extends Primitive {
     }
 
     getLocalBoundingRadius(): number {
-        // for infinite repetition, we need to return a large enough radius
-        // to cover at least one cell of the repetition
-        const primRadius = this.primitive.getLocalBoundingRadius();
-        const maxSpacing = Math.max(this.spacing[0], this.spacing[1], this.spacing[2]);
-        
-        // bounding radius should cover the primitive plus half the spacing
-        return primRadius + maxSpacing * 0.5;
+        // Infinite repetition means infinite bounding box
+        return Infinity;
+    }
+
+    getWorldPosition(): vec3 {
+        // use primitive world pos
+        return this.primitive.getWorldPosition();
     }
 }

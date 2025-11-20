@@ -30,7 +30,7 @@ export class BVH implements AccelerationStructure {
         primitives: Primitive[],
         bounds: BoundingBox,
         maxDepth: number = 20,
-        maxPrimitivesPerNode: number = 2
+        maxPrimitivesPerNode: number = 4
     ) {
         this.maxDepth = maxDepth;
         this.maxPrimitivesPerNode = maxPrimitivesPerNode;

@@ -7,6 +7,7 @@ export class SmoothUnion extends Primitive {
     smoothness: number;
 
     constructor(prim1: Primitive, prim2: Primitive, k: number) {
+        // Use identity transform - we'll override getWorldPosition
         super(mat4.create());
         this.prim1 = prim1;
         this.prim2 = prim2;
@@ -44,5 +45,16 @@ export class SmoothUnion extends Primitive {
         const centerDist = vec3.distance(pos1, pos2);
         
         return Math.max(r1, r2) + centerDist * 0.5;
+    }
+
+    getWorldPosition(): vec3 {
+        // return the midpoint between the two primitives
+        const pos1 = this.prim1.getWorldPosition();
+        const pos2 = this.prim2.getWorldPosition();
+        return vec3.fromValues(
+            (pos1[0] + pos2[0]) / 2,
+            (pos1[1] + pos2[1]) / 2,
+            (pos1[2] + pos2[2]) / 2
+        );
     }
 }
