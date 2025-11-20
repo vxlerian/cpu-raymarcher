@@ -194,6 +194,15 @@ export class SceneManager {
             ]
         },
         {
+            name: "Twisted Torus",
+            objects: [
+                SceneManager.createTwist(
+                    SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0)),
+                    3
+                )
+            ]
+        },
+        {
             name: "Screw",
             objects: [
                 SceneManager.createRound(
@@ -242,11 +251,27 @@ export class SceneManager {
             ]
         },
         {
-            name: "Infinite Torus Grid",
+            name: "67",
             objects: [
-                SceneManager.createRepetition(
-                    SceneManager.createTorus(0, 0, 0, 0.5),
-                    vec3.fromValues(2.5, 2.5, 2.5)
+                // 6
+                SceneManager.createRound(
+                    SceneManager.createBox(-1.3,-0.8,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/5)),
+                    0.20
+                ),
+                SceneManager.createRound(
+                    SceneManager.createTorus(-1.3,0.5,0,0.8, vec3.fromValues(-Math.PI/2, 0, 0)),
+                    0.05
+                ),
+
+
+                // 7
+                SceneManager.createRound(
+                    SceneManager.createBox(1.4,0,0, vec3.fromValues(0.05,1.5,0.05), vec3.fromValues(0,0,Math.PI/7)),
+                    0.20
+                ),
+                SceneManager.createRound(
+                    SceneManager.createBox(1.3,-1.4,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/2)),
+                    0.20
                 )
             ]
         }
