@@ -176,10 +176,10 @@ export class SceneManager {
             objects: [
                 SceneManager.createSmoothSubtract(
                     SceneManager.createRound(
-                        SceneManager.createBox(0,0,0,vec3.fromValues(1, 0.3, 1)),
+                        SceneManager.createBox(0,0,0,vec3.fromValues(1, 1, 1), vec3.fromValues(0,Math.PI/4,0)),
                         0.1
                     ),
-                    SceneManager.createSphere(0,-0.6,0,0.5),
+                    SceneManager.createSphere(0,0,0,0.9),
                     0.2
                 )
             ]
@@ -235,18 +235,6 @@ export class SceneManager {
                 SceneManager.createRepetition(
                     SceneManager.createSphere(0, 0, 0, 0.3),
                     vec3.fromValues(1.5, 1.5, 1.5)
-                )
-            ]
-        },
-        {
-            name: "Infinite Rounded Boxes",
-            objects: [
-                SceneManager.createRepetition(
-                    SceneManager.createRound(
-                        SceneManager.createBox(0, 0, 0, vec3.fromValues(0.3, 0.3, 0.3)),
-                        0.1
-                    ),
-                    vec3.fromValues(2.0, 2.0, 2.0)
                 )
             ]
         },
