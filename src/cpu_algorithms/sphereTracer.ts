@@ -104,14 +104,42 @@ export class SphereTracer extends Raymarcher {
     ): number {
         let totalDist = 0;
 
+        // initialise acceleration structure if available
+        const accelStruct = scene.getAccelerationStructure();
+        let accelState = null;
+        
+        if (accelStruct && accelStruct.onRayMarchStart) {
+            accelState = accelStruct.onRayMarchStart({
+                rayOrigin,
+                rayDirection: direction,
+                currentDistance: totalDist,
+                maxDistance: MAX_DIST
+            });
+            
+            // check if acceleration structure finds nothin
+            if (accelState && accelState.data && accelState.data.terminate) {
+                return MAX_DIST;
+            }
+        }
+
         for (let i = 0; i < MAX_STEPS; i++) {
             const p = vec3.create();
             vec3.scaleAndAdd(p, rayOrigin, direction, totalDist);
 
-            // Octree acceleration: skip empty space
-            if (scene.accelerationStructure === "Octree" && scene.octree) {
-                const skipDist = scene.octree.marchRay(rayOrigin, direction, totalDist);
-                if (skipDist > 0) {
+            // if needed do acceleration structure step callback
+            if (accelStruct && accelStruct.onRayMarchStep && accelState) {
+                const skipDist = accelStruct.onRayMarchStep({
+                    rayOrigin,
+                    rayDirection: direction,
+                    currentDistance: totalDist,
+                    maxDistance: MAX_DIST
+                }, accelState);
+                
+                if (skipDist === -1) {
+                    // acceleration structure signals nothing left
+                    return MAX_DIST;
+                } else if (skipDist > 0) {
+                    // skip forward by amount given by acceleration structure
                     totalDist += skipDist;
                     if (totalDist > MAX_DIST) break;
                     continue;
@@ -126,6 +154,11 @@ export class SphereTracer extends Raymarcher {
             // --- termination conditions ---
             if (dist < EPSILON) break; // hit surface
             if (totalDist > MAX_DIST) break; // too far
+        }
+
+        // call acceleration structure end callback
+        if (accelStruct && accelStruct.onRayMarchEnd && accelState) {
+            accelStruct.onRayMarchEnd(accelState);
         }
 
         return totalDist;

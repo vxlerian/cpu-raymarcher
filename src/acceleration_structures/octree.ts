@@ -1,7 +1,7 @@
 import { vec3 } from "gl-matrix";
 import { Primitive } from "../util/primitives/primitive";
 import { BoundingBox } from "./boundingBox";
-import { AccelerationStructure } from "./accelerationStructure";
+import { AccelerationStructure, RayMarchContext, RayMarchState } from "./accelerationStructure";
 
 export class OctreeNode {
     public bounds: BoundingBox;
@@ -275,5 +275,21 @@ export class Octree implements AccelerationStructure {
         }
         
         return 0; // node is not empty, evaluate normally
+    }
+
+    // acceleration structure callbacks
+    public onRayMarchStart(context: RayMarchContext): RayMarchState | null {
+        // octree doesnt do anything at the start
+        return { data: null };
+    }
+
+    public onRayMarchStep(context: RayMarchContext, state: RayMarchState): number {
+        // use the old marchRay function we wrote 
+        const skipDist = this.marchRay(
+            context.rayOrigin,
+            context.rayDirection,
+            context.currentDistance
+        );
+        return skipDist;
     }
 }
