@@ -46,6 +46,64 @@ export class BoundingBox {
         return Math.hypot(dx, dy, dz); // this function fire I don't have to do the sqrt thing now
     }
 
+    // distance from a point to this bounding box (0 if point is inside)
+    public distanceToPoint(point: vec3): number {
+        let dx = 0;
+        if (point[0] < this.min[0]) dx = this.min[0] - point[0];
+        else if (point[0] > this.max[0]) dx = point[0] - this.max[0];
+
+        let dy = 0;
+        if (point[1] < this.min[1]) dy = this.min[1] - point[1];
+        else if (point[1] > this.max[1]) dy = point[1] - this.max[1];
+
+        let dz = 0;
+        if (point[2] < this.min[2]) dz = this.min[2] - point[2];
+        else if (point[2] > this.max[2]) dz = point[2] - this.max[2];
+
+        return Math.hypot(dx, dy, dz);
+    }
+
+    // ray and bounding box intersection test
+    // returns [tMin, tMax] if ray intersects box, null otherwise
+    // ray is defined as: point = origin + t * direction
+    public intersectRay(origin: vec3, direction: vec3): [number, number] | null {
+        let tMin = -Infinity;
+        let tMax = Infinity;
+
+        // check each axis (x, y, z) separately
+        for (let i = 0; i < 3; i++) {
+            // if ray is going parallel to this axis, just check if we're between the bounds
+            if (Math.abs(direction[i]) < 1e-10) {
+                if (origin[i] < this.min[i] || origin[i] > this.max[i]) {
+                    return null; // we're outside the box on this axis, so no hit
+                }
+            } else {
+                // calculate where the ray hits the two planes on this axis
+                const invD = 1.0 / direction[i];
+                let t0 = (this.min[i] - origin[i]) * invD; // near plane
+                let t1 = (this.max[i] - origin[i]) * invD; // far plane
+
+                // make sure t0 is the closer one
+                if (t0 > t1) {
+                    const temp = t0;
+                    t0 = t1;
+                    t1 = temp;
+                }
+
+                // keep track of the latest entry and earliest exit across all axes
+                tMin = Math.max(tMin, t0);
+                tMax = Math.min(tMax, t1);
+
+                // if we enter after we exit, we miss the box
+                if (tMin > tMax) {
+                    return null;
+                }
+            }
+        }
+
+        return [tMin, tMax];
+    }
+
     // gets the center of the bounding box
     public center(): vec3 {
         return vec3.fromValues(

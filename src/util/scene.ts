@@ -1,6 +1,5 @@
 // for now, this always returns a default scene with a sphere
 
-// import { Camera } from "./camera";
 import { mat4, vec3 } from "gl-matrix";
 import { Primitive } from "./primitives/primitive";
 import { Sphere } from "./primitives/sphere";
@@ -9,6 +8,7 @@ import { SceneManager } from "./sceneManager";
 import { BoundingBox } from "../acceleration_structures/boundingBox";
 import { Octree } from "../acceleration_structures/octree";
 import { BVH } from "../acceleration_structures/bvh";
+import { AccelerationStructure } from "../acceleration_structures/accelerationStructure";
 
 export class Scene {
     // a scene is a list of objects and one camera
@@ -27,6 +27,13 @@ export class Scene {
         this.objectSDFs = new Array;
         this.accelerationStructure = accelerationStructure;
         this.loadPreset(0); // load default scene
+    }
+
+    // get the current acceleration structure implementation
+    public getAccelerationStructure(): AccelerationStructure | null {
+        if (this.accelerationStructure === "Octree") return this.octree;
+        if (this.accelerationStructure === "BVH") return this.bvh;
+        return null;
     }
 
     public loadPreset(index: number) {
@@ -151,27 +158,26 @@ export class Scene {
                 return closestDistance;
             }
             // outside the octree bounds??? ig fall back to full evaluation
-            for (const primitive of this.objectSDFs) {
-                if (sdfEvaluationCounter) sdfEvaluationCounter.count++;
-                closestDistance = Math.min(primitive.sdf(position), closestDistance);
-            }
         } else if (this.accelerationStructure === "BVH" && this.bvh) {
             // BVH-accelerated: only check nearby primitives
-            const candidates = this.bvh.getPrimitivesAt(position);
+            let candidates = this.bvh.getPrimitivesAt(position);
             
-            // If no candidates found... slowly step forward
-            if (candidates.length == 0) return 0.2;
+            // if nothing inside bounding box revert to full evaluation
+            // lowk not sure why this happens?
+            candidates = candidates.length === 0 ? this.objectSDFs : candidates;
             
             for (const primitive of candidates) {
                 if (sdfEvaluationCounter) sdfEvaluationCounter.count++;
                 closestDistance = Math.min(primitive.sdf(position), closestDistance);
             }
-        } else {
-            // Normal: check all primitives
-            for (const primitive of this.objectSDFs) {
-                if (sdfEvaluationCounter) sdfEvaluationCounter.count++;
-                closestDistance = Math.min(primitive.sdf(position), closestDistance);
-            }
+            
+            return closestDistance;
+        }
+
+        // Normal: check all primitives
+        for (const primitive of this.objectSDFs) {
+            if (sdfEvaluationCounter) sdfEvaluationCounter.count++;
+            closestDistance = Math.min(primitive.sdf(position), closestDistance);
         }
         
         return closestDistance;
