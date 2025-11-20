@@ -16,24 +16,34 @@ export type Scene = {
 };
 
 export class SceneManager {
-    private static getTransform(x: number, y: number, z: number) {
+    private static getTransform(x: number, y: number, z: number, rotation?: vec3) {
         const model = mat4.create();
-        mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
+        
+        if (rotation) {
+            // Apply rotation: first translate, then rotate
+            mat4.fromTranslation(model, [x, y, z]);
+            mat4.rotateX(model, model, rotation[0]);
+            mat4.rotateY(model, model, rotation[1]);
+            mat4.rotateZ(model, model, rotation[2]);
+        } else {
+            mat4.fromRotationTranslationScale(model, [0,0,0,1], [x,y,z], [1,1,1]);
+        }
+        
         const worldToLocal = mat4.create();
         mat4.invert(worldToLocal, model);
         return worldToLocal
     }
 
-    private static createSphere(x: number, y: number, z: number, radius: number): Sphere {
-        return new Sphere(SceneManager.getTransform(x, y, z), radius);
+    private static createSphere(x: number, y: number, z: number, radius: number, rotation?: vec3): Sphere {
+        return new Sphere(SceneManager.getTransform(x, y, z, rotation), radius);
     }
 
-    private static createBox(x: number, y: number, z: number, halfSize: vec3): Box {
-        return new Box(SceneManager.getTransform(x, y, z), halfSize);
+    private static createBox(x: number, y: number, z: number, halfSize: vec3, rotation?: vec3): Box {
+        return new Box(SceneManager.getTransform(x, y, z, rotation), halfSize);
     }
 
-    private static createTorus(x: number, y: number, z: number, radius: number): Primitive {
-        return new Torus(SceneManager.getTransform(x, y, z), radius, radius / 4);
+    private static createTorus(x: number, y: number, z: number, radius: number, rotation?: vec3): Primitive {
+        return new Torus(SceneManager.getTransform(x, y, z, rotation), radius, radius / 4);
     }
 
     private static createSmoothUnion(prim1: Primitive, prim2: Primitive, k: number) {
@@ -125,7 +135,7 @@ export class SceneManager {
         {
             name: "Torus",
             objects: [
-                SceneManager.createTorus(0, 0, 0, 1.3)
+                SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0))
             ]
         },
         {
