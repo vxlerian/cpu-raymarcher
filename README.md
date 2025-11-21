@@ -1,5 +1,5 @@
 # Raymarcher Visualiser
-By name (zXXXXXXX), name (zXXXXXXX), name (zXXXXXXX), name (zXXXXXXX), and name (zXXXXXXX)!
+By Group 11, COMP3821 25T3!
 
 > Note that the most stable version of the project is hosted publically, and can be found [here](https://vxlerian.github.io/cpu-raymarcher/).
 
