@@ -42,4 +42,9 @@ export class SmoothSubtraction extends Primitive {
         // use the first primitive's position
         return this.prim1.getWorldPosition();
     }
+
+    public setTime(time: number): void {
+        this.prim1.setTime(time);
+        this.prim2.setTime(time);
+    }
 }

@@ -20,6 +20,9 @@ export class SphereTracer extends Raymarcher {
         yStart: number = 0,
         yEnd: number = height
     ): void {
+        // update time for animated primitives
+        scene.updateTime(time);
+
         // --- get camera transforms once ---
         const rotMat4 = scene.camera.getRotationMatrix(mat4.create());
         const rotMat3 = mat3.create();

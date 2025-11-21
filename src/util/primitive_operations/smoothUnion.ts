@@ -57,4 +57,9 @@ export class SmoothUnion extends Primitive {
             (pos1[2] + pos2[2]) / 2
         );
     }
+
+    public setTime(time: number): void {
+        this.prim1.setTime(time);
+        this.prim2.setTime(time);
+    }
 }
