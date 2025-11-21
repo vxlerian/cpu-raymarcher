@@ -1,5 +1,5 @@
 {
-  "name": "raymarcher-test",
+  "name": "cpu-raymarcher",
   "version": "1.0.0",
   "description": "Hello there :)",
   "main": "src/main.ts",

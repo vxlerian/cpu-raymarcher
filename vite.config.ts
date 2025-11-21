@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/raymarcher-test/',
+  base: '/cpu-raymarcher/',
   build: {
     outDir: 'dist',
   },

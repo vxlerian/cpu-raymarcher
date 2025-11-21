@@ -1,7 +1,7 @@
 # Raymarcher Visualiser
 By name (zXXXXXXX), name (zXXXXXXX), name (zXXXXXXX), name (zXXXXXXX), and name (zXXXXXXX)!
 
-> Note that the most stable version of the project is hosted publically, and can be found [here](https://vxlerian.github.io/raymarcher-test/).
+> Note that the most stable version of the project is hosted publically, and can be found [here](https://vxlerian.github.io/cpu-raymarcher/).
 
 # About
 This project was created for COMP3821 (Extended Algorithm Design and Analysis), being a Major Project under the Creative/Experimental category. At its simplest, the project revolved around creating a visualiser to display output renders of various raymarching algorithms, as well as performing comparisons of performance metrics.
