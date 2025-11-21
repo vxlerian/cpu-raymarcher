@@ -533,7 +533,7 @@ select {
         font-size: 0.8rem;
     }
 
-    /* Analytics panel stacks vertically on mobile */
+    /* Analytics panel stacks vertically on mobile, reversed*/
     #analytics-app {
         flex-direction: column-reverse;
         border-radius: 0 12px 12px 12px;
