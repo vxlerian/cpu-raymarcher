@@ -58,8 +58,11 @@ export class SceneManager {
         animationSpeed: number = 0.05,
         rotation?: vec3
     ): Mandelbulb {
+        const transform = SceneManager.getTransform(x, y, z, rotation);
+        mat4.scale(transform, transform, [0.5, 0.5, 0.5]);
+        
         return new Mandelbulb(
-            SceneManager.getTransform(x, y, z, rotation), 
+            transform, 
             power, 
             iterations, 
             enableAnimation,
@@ -166,27 +169,6 @@ export class SceneManager {
             name: "Torus",
             objects: [
                 SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0))
-            ]
-        },
-        {
-            name: "Mandelbulb (Animated)",
-            objects: [
-                SceneManager.createMandelbulb(0, 0, 1.7, 8.0, 4, true, -0.0001, vec3.fromValues(-Math.PI/2,0,0))
-            ]
-        },
-        {
-            name: "Animated Smooth Union",
-            objects: [
-                SceneManager.createSmoothUnion(
-                    SceneManager.createAnimatedTranslate(
-                        SceneManager.createSphere(0, 0, 0, 1),
-                        vec3.fromValues(1, 0, 0), // X axis (left-right)
-                        3.0, // amplitude
-                        0.005  // speed
-                    ),
-                    SceneManager.createSphere(0, 0, 0, 1),
-                    0.2
-                )
             ]
         },
         {
@@ -311,6 +293,27 @@ export class SceneManager {
                 SceneManager.createRound(
                     SceneManager.createBox(1.25,-1.4,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/2)),
                     0.20
+                )
+            ]
+        },
+        {
+            name: "Mandelbulb (Animated)",
+            objects: [
+                SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
+            ]
+        },
+        {
+            name: "Animated Smooth Union",
+            objects: [
+                SceneManager.createSmoothUnion(
+                    SceneManager.createAnimatedTranslate(
+                        SceneManager.createSphere(0, 0, 0, 1),
+                        vec3.fromValues(1, 0, 0), // X axis (left-right)
+                        3.0, // amplitude
+                        0.005  // speed
+                    ),
+                    SceneManager.createSphere(0, 0, 0, 1),
+                    0.2
                 )
             ]
         }
