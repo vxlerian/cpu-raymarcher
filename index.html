@@ -6,8 +6,8 @@
     <title>Raymarcher Visualiser</title>
     <!-- donut -->
     <link rel="icon" type="image/x-icon" href="/cpu-raymarcher/favicon.ico">
-  <script type="module" crossorigin src="/cpu-raymarcher/assets/index-Di-Q0UdJ.js"></script>
-  <link rel="stylesheet" crossorigin href="/cpu-raymarcher/assets/index-CqxiMFS0.css">
+  <script type="module" crossorigin src="/cpu-raymarcher/assets/index-BJDBX-43.js"></script>
+  <link rel="stylesheet" crossorigin href="/cpu-raymarcher/assets/index-pCBv0YPz.css">
 </head>
 <body>
     <!-- Fixed top bar with title + theme toggle -->
@@ -91,7 +91,9 @@
                         </div>
 
                         <div>
-                            <label for="scene-select">Select scene: </label>
+                            <!-- No other way to do this without making it wonky! -->
+                            <label for="scene-select">Select scene:</label>
+                            <div class="field-hint">Scenes marked [A] are animated.</div>
                             <select name="selectedScene" id="scene-select">
                                 <!-- Will be filled automatically in main.ts -->
                             </select>
