@@ -32,4 +32,8 @@ export class Round extends Primitive {
         // use wrapped primitive world position
         return this.primitive.getWorldPosition();
     }
+
+    public setTime(time: number): void {
+        this.primitive.setTime(time);
+    }
 }

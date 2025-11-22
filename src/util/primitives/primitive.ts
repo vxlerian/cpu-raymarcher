@@ -37,4 +37,9 @@ export abstract class Primitive {
         // evaluate local SDF
         return this.localSdf(localPos);
     }
+
+    // update time for animation (override in animated primitives)
+    public setTime(time: number): void {
+        // default: do nothing (most primitives dont need it)
+    }
 }

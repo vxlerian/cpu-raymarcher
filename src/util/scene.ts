@@ -1,8 +1,7 @@
 // for now, this always returns a default scene with a sphere
 
-import { mat4, vec3 } from "gl-matrix";
+import { vec3 } from "gl-matrix";
 import { Primitive } from "./primitives/primitive";
-import { Sphere } from "./primitives/sphere";
 import { Camera } from "./camera";
 import { SceneManager } from "./sceneManager";
 import { BoundingBox } from "../acceleration_structures/boundingBox";
@@ -131,6 +130,13 @@ export class Scene {
             name: preset.name,
             total: SceneManager.getPresetCount()
         };
+    }
+
+    // update time for all animated primitives
+    public updateTime(time: number): void {
+        for (const primitive of this.objectSDFs) {
+            primitive.setTime(time);
+        }
     }
 
     // get the min distance to the scene at a given position

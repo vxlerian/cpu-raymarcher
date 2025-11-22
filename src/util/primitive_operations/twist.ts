@@ -44,4 +44,8 @@ export class Twist extends Primitive {
         // same world position as primitive
         return this.primitive.getWorldPosition();
     }
+
+    public setTime(time: number): void {
+        this.primitive.setTime(time);
+    }
 }

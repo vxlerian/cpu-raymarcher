@@ -3,12 +3,14 @@ import { Primitive } from "./primitives/primitive";
 import { Sphere } from "./primitives/sphere";
 import { Box } from "./primitives/box";
 import { Torus } from "./primitives/torus";
+import { Mandelbulb } from "./primitives/mandelbulb";
 
 import { SmoothUnion } from "./primitive_operations/smoothUnion";
 import { Twist } from "./primitive_operations/twist";
 import { Round } from "./primitive_operations/round";
 import { SmoothSubtraction } from "./primitive_operations/smoothSubstraction";
 import { Repetition } from "./primitive_operations/repetition";
+import { AnimatedTranslate } from "./primitive_operations/animatedTranslate";
 
 export type Scene = {
     name: string;
@@ -46,6 +48,28 @@ export class SceneManager {
         return new Torus(SceneManager.getTransform(x, y, z, rotation), radius, radius / 4);
     }
 
+    private static createMandelbulb(
+        x: number, 
+        y: number, 
+        z: number, 
+        power: number = 8.0,
+        iterations: number = 9,
+        enableAnimation: boolean = true,
+        animationSpeed: number = 0.05,
+        rotation?: vec3
+    ): Mandelbulb {
+        const transform = SceneManager.getTransform(x, y, z, rotation);
+        mat4.scale(transform, transform, [0.5, 0.5, 0.5]);
+        
+        return new Mandelbulb(
+            transform, 
+            power, 
+            iterations, 
+            enableAnimation,
+            animationSpeed
+        );
+    }
+
     private static createSmoothUnion(prim1: Primitive, prim2: Primitive, k: number) {
         return new SmoothUnion(prim1, prim2, k);
     }
@@ -64,6 +88,15 @@ export class SceneManager {
 
     private static createRepetition(primitive: Primitive, spacing: vec3) {
         return new Repetition(primitive, spacing);
+    }
+
+    private static createAnimatedTranslate(
+        primitive: Primitive, 
+        direction: vec3 = vec3.fromValues(1, 0, 0),
+        amplitude: number = 2.0,
+        speed: number = 0.5
+    ) {
+        return new AnimatedTranslate(primitive, direction, amplitude, speed);
     }
 
     public static readonly presets: Scene[] = [
@@ -260,6 +293,27 @@ export class SceneManager {
                 SceneManager.createRound(
                     SceneManager.createBox(1.25,-1.4,0, vec3.fromValues(0.05,0.8,0.05), vec3.fromValues(0,0,Math.PI/2)),
                     0.20
+                )
+            ]
+        },
+        {
+            name: "Mandelbulb (Animated)",
+            objects: [
+                SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
+            ]
+        },
+        {
+            name: "Animated Smooth Union",
+            objects: [
+                SceneManager.createSmoothUnion(
+                    SceneManager.createAnimatedTranslate(
+                        SceneManager.createSphere(0, 0, 0, 1),
+                        vec3.fromValues(1, 0, 0), // x axis (left to right)
+                        3.0, // amplitude
+                        0.005  // speed
+                    ),
+                    SceneManager.createSphere(0, 0, 0, 1),
+                    0.2
                 )
             ]
         }

@@ -37,4 +37,8 @@ export class Repetition extends Primitive {
         // use primitive world pos
         return this.primitive.getWorldPosition();
     }
+
+    public setTime(time: number): void {
+        this.primitive.setTime(time);
+    }
 }
