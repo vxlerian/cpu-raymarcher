@@ -231,7 +231,7 @@ export class SceneManager {
         },
         // Miscellaneous scenes.
         {
-            name: "Smooth Union (Animated)",
+            name: "Smooth Union [A]",
             objects: [
                 SceneManager.createSmoothUnion(
                     SceneManager.createAnimatedTranslate(
@@ -246,7 +246,7 @@ export class SceneManager {
             ]
         },
         {
-            name: "Mandelbulb (Animated)",
+            name: "Mandelbulb [A]",
             objects: [
                 SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
             ]

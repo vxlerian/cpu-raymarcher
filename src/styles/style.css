@@ -246,6 +246,12 @@ select {
     min-width: 160px;
 }
 
+.field-hint {
+    margin-bottom: 0.25rem;
+    font-size: 0.6rem;
+    color: var(--label-color);
+}
+
 /* Theme switch button */
 #theme-switch {
     height: 48px;
