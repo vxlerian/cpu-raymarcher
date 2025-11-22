@@ -66,6 +66,77 @@ let algorithm = 'sphere-tracer';
 const algoSelect = document.getElementById('algorithm') as HTMLSelectElement;
 const analyticsAlgoSelect = document.getElementById('analytics-algorithm') as HTMLSelectElement | null;
 
+// default slider parameters
+let overshootFactor = 1.2;
+let stepSize = 0.1;
+
+// slider elements
+const overshootSlider = document.getElementById('overshoot-slider') as HTMLInputElement | null;
+const overshootValue = document.getElementById('overshoot-value') as HTMLSpanElement | null;
+const overshootContainer = document.getElementById('overshoot-slider-container') as HTMLDivElement | null;
+
+const stepsizeSlider = document.getElementById('stepsize-slider') as HTMLInputElement | null;
+const stepsizeValue = document.getElementById('stepsize-value') as HTMLSpanElement | null;
+const stepsizeContainer = document.getElementById('stepsize-slider-container') as HTMLDivElement | null;
+
+const analyticsOvershootSlider = document.getElementById('analytics-overshoot-slider') as HTMLInputElement | null;
+const analyticsOvershootValue = document.getElementById('analytics-overshoot-value') as HTMLSpanElement | null;
+const analyticsOvershootContainer = document.getElementById('analytics-overshoot-slider-container') as HTMLDivElement | null;
+
+const analyticsStepsizeSlider = document.getElementById('analytics-stepsize-slider') as HTMLInputElement | null;
+const analyticsStepsizeValue = document.getElementById('analytics-stepsize-value') as HTMLSpanElement | null;
+const analyticsStepsizeContainer = document.getElementById('analytics-stepsize-slider-container') as HTMLDivElement | null;
+
+// handle overshoot slider changes
+function handleOvershootChange(value: number) {
+    overshootFactor = value;
+    if (overshootValue) overshootValue.textContent = value.toFixed(2);
+    if (analyticsOvershootValue) analyticsOvershootValue.textContent = value.toFixed(2);
+    if (overshootSlider) overshootSlider.value = String(value);
+    if (analyticsOvershootSlider) analyticsOvershootSlider.value = String(value);
+}
+
+overshootSlider?.addEventListener('input', (e) => {
+    const value = parseFloat((e.target as HTMLInputElement).value);
+    handleOvershootChange(value);
+});
+
+analyticsOvershootSlider?.addEventListener('input', (e) => {
+    const value = parseFloat((e.target as HTMLInputElement).value);
+    handleOvershootChange(value);
+});
+
+// handle step size slider changes
+function handleStepsizeChange(value: number) {
+    stepSize = value;
+    if (stepsizeValue) stepsizeValue.textContent = value.toFixed(2);
+    if (analyticsStepsizeValue) analyticsStepsizeValue.textContent = value.toFixed(2);
+    if (stepsizeSlider) stepsizeSlider.value = String(value);
+    if (analyticsStepsizeSlider) analyticsStepsizeSlider.value = String(value);
+}
+
+stepsizeSlider?.addEventListener('input', (e) => {
+    const value = parseFloat((e.target as HTMLInputElement).value);
+    handleStepsizeChange(value);
+});
+
+analyticsStepsizeSlider?.addEventListener('input', (e) => {
+    const value = parseFloat((e.target as HTMLInputElement).value);
+    handleStepsizeChange(value);
+});
+
+// show/hide sliders based on algorithm
+function updateSliderVisibility() {
+    const showOvershoot = algorithm === 'adaptive-step-v2';
+    const showStepsize = algorithm === 'fixed-step';
+    
+    if (overshootContainer) overshootContainer.style.display = showOvershoot ? 'block' : 'none';
+    if (analyticsOvershootContainer) analyticsOvershootContainer.style.display = showOvershoot ? 'block' : 'none';
+    
+    if (stepsizeContainer) stepsizeContainer.style.display = showStepsize ? 'block' : 'none';
+    if (analyticsStepsizeContainer) analyticsStepsizeContainer.style.display = showStepsize ? 'block' : 'none';
+}
+
 type AnalyticMetric = 'frame-length' | 'avg-sdf' | 'max-sdf' | 'avg-iters';
 let selectedMetric: AnalyticMetric = 'avg-sdf';
 const metricTitles: Record<AnalyticMetric, string> = {
@@ -140,6 +211,9 @@ function handleAlgorithmChange(selectedAlgo: string) {
     if (analyticsAlgoSelect) {
         analyticsAlgoSelect.value = selectedAlgo;
     }
+
+    // update slider visibility
+    updateSliderVisibility();
 
     // reset graph data for new algorithm
     resetGraph();
@@ -394,7 +468,19 @@ async function render(time: number) {
             };
             w.addEventListener('message', handler);
             const sceneInfo = scene.getCurrentPresetInfo();
-            w.postMessage({ width, height, time, yStart, yEnd, camera: { pitch, yaw }, algorithm, scenePresetIndex: sceneInfo.index, accelerationStructure });
+            w.postMessage({ 
+                width, 
+                height, 
+                time, 
+                yStart, 
+                yEnd, 
+                camera: { pitch, yaw }, 
+                algorithm, 
+                scenePresetIndex: sceneInfo.index, 
+                accelerationStructure,
+                overshootFactor,
+                stepSize
+            });
         });
     });
 
@@ -627,5 +713,7 @@ right?.addEventListener('pointerout', () => {
     mobilePressed["right"] = false;
 });
 
+// initialize slider visibility based on default algorithm
+updateSliderVisibility();
 
 requestAnimationFrame(render);

@@ -252,6 +252,34 @@ select {
     color: var(--label-color);
 }
 
+input[type="range"] {
+    width: 100%;
+    margin: 0.25rem 0;
+}
+
+#overshoot-slider-container,
+#stepsize-slider-container,
+#analytics-overshoot-slider-container,
+#analytics-stepsize-slider-container {
+    margin-top: 0.5rem;
+}
+
+#overshoot-slider-container label,
+#stepsize-slider-container label,
+#analytics-overshoot-slider-container label,
+#analytics-stepsize-slider-container label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.analytics-sliders {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
 /* Theme switch button */
 #theme-switch {
     height: 48px;
