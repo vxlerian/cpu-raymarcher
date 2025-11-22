@@ -100,6 +100,7 @@ export class SceneManager {
     }
 
     public static readonly presets: Scene[] = [
+        // Basic sphere scenes
         {
             name: "Sphere",
             objects: [
@@ -145,27 +146,6 @@ export class SceneManager {
             ]
         },
         {
-            name: "Cube",
-            objects: [
-                SceneManager.createBox(0, 0, 0, vec3.fromValues(1, 1, 1))
-            ]
-        },
-        {
-            name: "Sphere and Cube",
-            objects: [
-                SceneManager.createSphere(-0.7, 0, 0, 0.5),
-                SceneManager.createBox(1, 0, 0, vec3.fromValues(0.5, 0.5, 0.5))
-            ]
-        },
-        {
-            name: "Pyramid of Boxes",
-            objects: [
-                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
-                SceneManager.createBox(0, 0, 0, vec3.fromValues(0.6, 0.25, 0.6)),
-                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
-            ]
-        },
-        {
             name: "Torus",
             objects: [
                 SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0))
@@ -194,6 +174,40 @@ export class SceneManager {
                 return spheres;
             })()
         },
+
+        // 7-10: Rounded/Cube scenes
+        {
+            name: "Rounded Box",
+            objects: [
+                SceneManager.createRound(
+                    SceneManager.createBox(0, 0, 0, vec3.fromValues(0.4, 0.4, 0.4)),
+                    0.3
+                )
+            ]
+        },
+        {
+            name: "Cube",
+            objects: [
+                SceneManager.createBox(0, 0, 0, vec3.fromValues(1, 1, 1))
+            ]
+        },
+        {
+            name: "Pyramid of Boxes",
+            objects: [
+                SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
+                SceneManager.createBox(0, 0, 0, vec3.fromValues(0.6, 0.25, 0.6)),
+                SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
+            ]
+        },
+        {
+            name: "Sphere and Cube",
+            objects: [
+                SceneManager.createSphere(-0.7, 0, 0, 0.5),
+                SceneManager.createBox(1, 0, 0, vec3.fromValues(0.5, 0.5, 0.5))
+            ]
+        },
+
+        // Set operators
         {
             name: "Smooth Union",
             objects: [
@@ -218,14 +232,22 @@ export class SceneManager {
             ]
         },
         {
-            name: "Rounded Box",
+            name: "Animated Smooth Union",
             objects: [
-                SceneManager.createRound(
-                    SceneManager.createBox(0, 0, 0, vec3.fromValues(0.4, 0.4, 0.4)),
-                    0.3
+                SceneManager.createSmoothUnion(
+                    SceneManager.createAnimatedTranslate(
+                        SceneManager.createSphere(0, 0, 0, 1),
+                        vec3.fromValues(1, 0, 0), // x axis (left to right)
+                        3.0, // amplitude
+                        0.005  // speed
+                    ),
+                    SceneManager.createSphere(0, 0, 0, 1),
+                    0.2
                 )
             ]
         },
+
+        // Miscellaneous scenes.
         {
             name: "Twisted Torus",
             objects: [
@@ -233,6 +255,21 @@ export class SceneManager {
                     SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0)),
                     3
                 )
+            ]
+        },
+        {
+            name: "Infinite Spheres",
+            objects: [
+                SceneManager.createRepetition(
+                    SceneManager.createSphere(0, 0, 0, 0.3),
+                    vec3.fromValues(1.5, 1.5, 1.5)
+                )
+            ]
+        },
+        {
+            name: "Mandelbulb (Animated)",
+            objects: [
+                SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
             ]
         },
         {
@@ -290,15 +327,6 @@ export class SceneManager {
             ]
         },
         {
-            name: "Infinite Spheres",
-            objects: [
-                SceneManager.createRepetition(
-                    SceneManager.createSphere(0, 0, 0, 0.3),
-                    vec3.fromValues(1.5, 1.5, 1.5)
-                )
-            ]
-        },
-        {
             name: "67",
             objects: [
                 SceneManager.createSmoothUnion(
@@ -326,27 +354,6 @@ export class SceneManager {
                         0.20
                     ),
                     0.0001
-                )
-            ]
-        },
-        {
-            name: "Mandelbulb (Animated)",
-            objects: [
-                SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
-            ]
-        },
-        {
-            name: "Animated Smooth Union",
-            objects: [
-                SceneManager.createSmoothUnion(
-                    SceneManager.createAnimatedTranslate(
-                        SceneManager.createSphere(0, 0, 0, 1),
-                        vec3.fromValues(1, 0, 0), // x axis (left to right)
-                        3.0, // amplitude
-                        0.005  // speed
-                    ),
-                    SceneManager.createSphere(0, 0, 0, 1),
-                    0.2
                 )
             ]
         }
