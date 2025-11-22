@@ -108,32 +108,6 @@ export class SceneManager {
             ]
         },
         {
-            name: "Grid of Spheres",
-            objects: [
-                SceneManager.createSphere(-1, -1, 0, 0.3),
-                SceneManager.createSphere(0, -1, 0, 0.3),
-                SceneManager.createSphere(1, -1, 0, 0.3),
-                SceneManager.createSphere(-1, 0, 0, 0.3),
-                SceneManager.createSphere(0, 0, 0, 0.3),
-                SceneManager.createSphere(1, 0, 0, 0.3),
-                SceneManager.createSphere(-1, 1, 0, 0.3),
-                SceneManager.createSphere(0, 1, 0, 0.3),
-                SceneManager.createSphere(1, 1, 0, 0.3)
-            ]
-        },
-        {
-            name: "Atom",
-            objects: [
-                SceneManager.createSphere(0, 0, 0, 0.5),
-                SceneManager.createSphere(1.2, 0, 0, 0.3),
-                SceneManager.createSphere(-1.2, 0, 0, 0.3),
-                SceneManager.createSphere(0, 1.2, 0, 0.3),
-                SceneManager.createSphere(0, -1.2, 0, 0.3),
-                SceneManager.createSphere(0, 0, 1.2, 0.3),
-                SceneManager.createSphere(0, 0, -1.2, 0.3)
-            ]
-        },
-        {
             name: "Random Spheres",
             objects: [
                 SceneManager.createSphere(0.8, -0.3, 0.2, 0.4),
@@ -146,9 +120,17 @@ export class SceneManager {
             ]
         },
         {
-            name: "Torus",
+            name: "Grid of Spheres",
             objects: [
-                SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0))
+                SceneManager.createSphere(-1, -1, 0, 0.3),
+                SceneManager.createSphere(0, -1, 0, 0.3),
+                SceneManager.createSphere(1, -1, 0, 0.3),
+                SceneManager.createSphere(-1, 0, 0, 0.3),
+                SceneManager.createSphere(0, 0, 0, 0.3),
+                SceneManager.createSphere(1, 0, 0, 0.3),
+                SceneManager.createSphere(-1, 1, 0, 0.3),
+                SceneManager.createSphere(0, 1, 0, 0.3),
+                SceneManager.createSphere(1, 1, 0, 0.3)
             ]
         },
         {
@@ -174,7 +156,24 @@ export class SceneManager {
                 return spheres;
             })()
         },
-
+        {
+            name: "Atom",
+            objects: [
+                SceneManager.createSphere(0, 0, 0, 0.5),
+                SceneManager.createSphere(1.2, 0, 0, 0.3),
+                SceneManager.createSphere(-1.2, 0, 0, 0.3),
+                SceneManager.createSphere(0, 1.2, 0, 0.3),
+                SceneManager.createSphere(0, -1.2, 0, 0.3),
+                SceneManager.createSphere(0, 0, 1.2, 0.3),
+                SceneManager.createSphere(0, 0, -1.2, 0.3)
+            ]
+        },
+        {
+            name: "Torus",
+            objects: [
+                SceneManager.createTorus(0, 0, 0, 1.3, vec3.fromValues(-Math.PI/2,0,0))
+            ]
+        },
         // 7-10: Rounded/Cube scenes
         {
             name: "Rounded Box",
@@ -192,6 +191,13 @@ export class SceneManager {
             ]
         },
         {
+            name: "Sphere and Cube",
+            objects: [
+                SceneManager.createSphere(-0.7, 0, 0, 0.5),
+                SceneManager.createBox(1, 0, 0, vec3.fromValues(0.5, 0.5, 0.5))
+            ]
+        },
+        {
             name: "Pyramid of Boxes",
             objects: [
                 SceneManager.createBox(0, 0.5, 0, vec3.fromValues(0.9, 0.25, 0.9)),
@@ -199,14 +205,6 @@ export class SceneManager {
                 SceneManager.createBox(0, -0.5, 0, vec3.fromValues(0.3, 0.25, 0.3))
             ]
         },
-        {
-            name: "Sphere and Cube",
-            objects: [
-                SceneManager.createSphere(-0.7, 0, 0, 0.5),
-                SceneManager.createBox(1, 0, 0, vec3.fromValues(0.5, 0.5, 0.5))
-            ]
-        },
-
         // Set operators
         {
             name: "Smooth Union",
@@ -248,6 +246,12 @@ export class SceneManager {
             ]
         },
         {
+            name: "Mandelbulb (Animated)",
+            objects: [
+                SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
+            ]
+        },
+        {
             name: "Twisted Torus",
             objects: [
                 SceneManager.createTwist(
@@ -263,12 +267,6 @@ export class SceneManager {
                     SceneManager.createSphere(0, 0, 0, 0.3),
                     vec3.fromValues(1.5, 1.5, 1.5)
                 )
-            ]
-        },
-        {
-            name: "Mandelbulb (Animated)",
-            objects: [
-                SceneManager.createMandelbulb(0, 0, 0, 8, 80, true, -0.0001, undefined)
             ]
         },
         {
