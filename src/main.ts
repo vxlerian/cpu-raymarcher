@@ -127,7 +127,7 @@ analyticsStepsizeSlider?.addEventListener('input', (e) => {
 
 // show/hide sliders based on algorithm
 function updateSliderVisibility() {
-    const showOvershoot = algorithm === 'adaptive-step-v2';
+    const showOvershoot = algorithm === 'adaptive-step-v2' || algorithm === 'adaptive-step-v3' ;
     const showStepsize = algorithm === 'fixed-step';
     
     if (overshootContainer) overshootContainer.style.display = showOvershoot ? 'block' : 'none';
@@ -198,6 +198,9 @@ function handleAlgorithmChange(selectedAlgo: string) {
             break;
         case 'adaptive-step-v2':
             algorithm = 'adaptive-step-v2';
+            break;
+        case 'adaptive-step-v3':
+            algorithm = 'adaptive-step-v3';
             break;
         case 'sphere-tracing':
         default:
