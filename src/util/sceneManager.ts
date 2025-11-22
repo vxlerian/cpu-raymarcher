@@ -231,8 +231,9 @@ export class SceneManager {
                 )
             ]
         },
+        // Miscellaneous scenes.
         {
-            name: "Animated Smooth Union",
+            name: "Smooth Union (Animated)",
             objects: [
                 SceneManager.createSmoothUnion(
                     SceneManager.createAnimatedTranslate(
@@ -246,8 +247,6 @@ export class SceneManager {
                 )
             ]
         },
-
-        // Miscellaneous scenes.
         {
             name: "Twisted Torus",
             objects: [
