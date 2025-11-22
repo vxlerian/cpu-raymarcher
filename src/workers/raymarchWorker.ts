@@ -16,6 +16,8 @@ type Job = {
   algorithm: string;
   scenePresetIndex: number;
   accelerationStructure: string;
+  overshootFactor?: number;
+  stepSize?: number;
 };
 
 type Result = {
@@ -28,7 +30,7 @@ type Result = {
 };
 
 self.onmessage = (e: MessageEvent<Job>) => {
-  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex, accelerationStructure } = e.data;
+  const { width, height, time, yStart, yEnd, camera, algorithm, scenePresetIndex, accelerationStructure, overshootFactor, stepSize } = e.data;
 
   // Build a fresh scene and set camera orientation
   const scene = new Scene(accelerationStructure);
@@ -49,13 +51,13 @@ self.onmessage = (e: MessageEvent<Job>) => {
       alg = new SphereTracer();
       break;
     case 'fixed-step':
-      alg = new FixedStep();
+      alg = new FixedStep(stepSize);
       break;
     case 'adaptive-step':
       alg = new AdaptiveStep();
       break;
     case 'adaptive-step-v2':
-      alg = new AdaptiveStepV2();
+      alg = new AdaptiveStepV2(overshootFactor);
       break;
     default:
       alg = new SphereTracer();

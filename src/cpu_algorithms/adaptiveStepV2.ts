@@ -3,12 +3,18 @@ import { Raymarcher } from './raymarcher'
 const MAX_STEPS = 100;
 const MAX_DIST = 10;
 const EPSILON = 0.001;
-const OVERSHOOT_FACTOR = 1.2; // how much to overshoot by
 
 import { Scene } from '../util/scene';
 import { vec3 } from 'gl-matrix';
 
 export class AdaptiveStepV2 extends Raymarcher {
+    private overshootFactor: number; // how much to overshoot by
+
+    constructor(overshootFactor: number = 1.2) {
+        super();
+        this.overshootFactor = overshootFactor;
+    }
+
     protected getMaxDistance(): number {
         return MAX_DIST;
     }
@@ -95,7 +101,7 @@ export class AdaptiveStepV2 extends Raymarcher {
                 if (spheresOverlapped) {
                     // the previous step was safe! we can continue with our 
                     // overshooting strategy
-                    const step = newSDF * OVERSHOOT_FACTOR;
+                    const step = newSDF * this.overshootFactor;
                     totalDist += step;
                     prevSDF = newSDF;
                     prevStep = step;

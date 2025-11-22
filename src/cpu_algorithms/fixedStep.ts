@@ -3,12 +3,17 @@ import { Raymarcher } from './raymarcher';
 const MAX_STEPS = 200;     // usually higher than sphere tracing for smoother results
 const MAX_DIST = 10;
 const EPSILON = 0.001;
-const FIXED_STEP_SIZE = 0.1; // tune this for resolution vs. performance
 
 import { Scene } from '../util/scene';
 import { vec3 } from 'gl-matrix';
 
 export class FixedStep extends Raymarcher {
+    private stepSize: number; // how much to step by
+
+    constructor(stepSize: number = 0.1) {
+        super();
+        this.stepSize = stepSize;
+    }
     protected getMaxDistance(): number {
         return MAX_DIST;
     }
@@ -75,7 +80,7 @@ export class FixedStep extends Raymarcher {
                 break;
             }
 
-            totalDist += FIXED_STEP_SIZE;
+            totalDist += this.stepSize;
 
             if (totalDist > MAX_DIST) break;
         }
