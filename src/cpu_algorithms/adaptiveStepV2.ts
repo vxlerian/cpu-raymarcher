@@ -1,20 +1,14 @@
-import { Raymarcher } from './raymarcher';
+import { Raymarcher } from './raymarcher'
 
-const MAX_STEPS = 200;     // usually higher than sphere tracing for smoother results
+const MAX_STEPS = 100;
 const MAX_DIST = 10;
 const EPSILON = 0.001;
-const FIXED_STEP_SIZE = 0.1; // tune this for resolution vs. performance
-
-const STEP_SCALE = 0.8;
-const MIN_STEP = FIXED_STEP_SIZE * 0.25;
-const MAX_STEP = FIXED_STEP_SIZE * 5.0;
-const NEAR_DIST = 0.1;
-const NEAR_STEP = 0.01;
+const OVERSHOOT_FACTOR = 1.2; // how much to overshoot by
 
 import { Scene } from '../util/scene';
 import { vec3 } from 'gl-matrix';
 
-export class AdaptiveStep extends Raymarcher {
+export class AdaptiveStepV2 extends Raymarcher {
     protected getMaxDistance(): number {
         return MAX_DIST;
     }
@@ -28,7 +22,10 @@ export class AdaptiveStep extends Raymarcher {
         iterationsBuffer: Uint16Array,
     ): number {
         let totalDist = 0;
-        let hit = false;
+        let prevSDF = 0; // track the last SDF evaluation
+        let prevStep = 0; // track the actual step we took to get to current position
+
+        /////////////// This stuff is the same as Sphere Tracing ///////////////
 
         // initialise acceleration structure if available
         const accelStruct = scene.getAccelerationStructure();
@@ -42,7 +39,7 @@ export class AdaptiveStep extends Raymarcher {
                 maxDistance: MAX_DIST
             });
             
-            // check if acceleration structure finds nothin
+            // check if acceleration structure finds nothing
             if (accelState && accelState.data && accelState.data.terminate) {
                 return MAX_DIST;
             }
@@ -68,32 +65,48 @@ export class AdaptiveStep extends Raymarcher {
                     // skip forward by amount given by acceleration structure
                     totalDist += skipDist;
                     if (totalDist > MAX_DIST) break;
+                    prevSDF = 0; // reset adaptive stuff
+                    prevStep = 0;
                     continue;
                 }
             }
-            
-            const dist = this.getSceneDistance(scene, p, idx, SDFevaluationBuffer);
+
+            const newSDF = this.getSceneDistance(scene, p, idx, SDFevaluationBuffer);
             iterationsBuffer[idx] += 1;
 
-            // --- check for surface ---
-            if (dist < EPSILON) {
-                hit = true;
-                break;
-            }
-
-            // Adaptive step
-            let step;
-            if (dist < NEAR_DIST) {
-                step = NEAR_STEP;
+            // --- termination conditions ---
+            if (newSDF < EPSILON) break; // hit surface
+            if (totalDist > MAX_DIST) break; // too far
+        
+            ////// Adaptive-Specific: check overshoot using previous step //////
+            
+            // on first iteration or we just failed to overshoot...
+            // just use normal sphere tracing to start process again
+            if (i === 0 || prevSDF == 0) {
+                const step = newSDF;
+                totalDist += step;
+                prevSDF = newSDF;
+                prevStep = step;
             } else {
-                step = STEP_SCALE * dist;
-                if (step < MIN_STEP) step = MIN_STEP;
-                if (step > MAX_STEP) step = MAX_STEP;
+                // check if the previous step we took was safe
+                // the spheres overlap if: prevStep <= (prevSDF + newSDF)
+                const spheresOverlapped = prevStep <= (prevSDF + newSDF);
+                
+                if (spheresOverlapped) {
+                    // the previous step was safe! we can continue with our 
+                    // overshooting strategy
+                    const step = newSDF * OVERSHOOT_FACTOR;
+                    totalDist += step;
+                    prevSDF = newSDF;
+                    prevStep = step;
+                } else {
+                    // gap detected - the previous step was too aggressive
+                    // go back to previous position and take conservative step
+                    totalDist -= prevStep; // go back to previous position
+                    totalDist += prevSDF; // take the safe sphere tracer step
+                    prevStep = prevSDF;
+                }
             }
-
-            totalDist += step;
-
-            if (totalDist > MAX_DIST) break;
         }
 
         // call acceleration structure end callback
@@ -101,6 +114,6 @@ export class AdaptiveStep extends Raymarcher {
             accelStruct.onRayMarchEnd(accelState);
         }
 
-        return hit ? totalDist : MAX_DIST;
+        return totalDist;
     }
 }

@@ -3,6 +3,7 @@ import { Scene } from '../util/scene';
 import { SphereTracer } from '../cpu_algorithms/sphereTracer';
 import { FixedStep } from '../cpu_algorithms/fixedStep';
 import { AdaptiveStep } from '../cpu_algorithms/adaptiveStep';
+import { AdaptiveStepV2 } from '../cpu_algorithms/adaptiveStepV2';
 
 // Types exchanged with the main thread
 type Job = {
@@ -52,6 +53,9 @@ self.onmessage = (e: MessageEvent<Job>) => {
       break;
     case 'adaptive-step':
       alg = new AdaptiveStep();
+      break;
+    case 'adaptive-step-v2':
+      alg = new AdaptiveStepV2();
       break;
     default:
       alg = new SphereTracer();

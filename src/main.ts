@@ -125,6 +125,9 @@ function handleAlgorithmChange(selectedAlgo: string) {
         case 'adaptive-step':
             algorithm = 'adaptive-step';
             break;
+        case 'adaptive-step-v2':
+            algorithm = 'adaptive-step-v2';
+            break;
         case 'sphere-tracing':
         default:
             // HTML uses "sphere-tracing", worker expects "sphere-tracer"
